@@ -1,0 +1,16 @@
+body {
+	background-color : #000;
+	margin : 0px;
+	padding : 0px;
+	color : #fff;
+	overflow: hidden;
+}
+
+#heightmap {
+	position : absolute;
+	top : 5px;
+	left : 5px;
+	display: none;
+}
+
+.property-name a { color : #eee; }
