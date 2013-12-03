@@ -7,6 +7,7 @@ var DEMO =
 	ms_Controls: null,
 	ms_IsDisplaying: false,
 	ms_Terrain: null,
+	ms_Water: null,
 	
 	Enable: ( function() 
 	{
@@ -27,32 +28,58 @@ var DEMO =
 		this.ms_Canvas.html( this.ms_Renderer.domElement );
 		this.ms_Scene = new THREE.Scene();
 		
-		this.ms_Camera = new THREE.PerspectiveCamera( 55.0, Window.ms_Width / Window.ms_Height, 0.01, 10000 );
+		this.ms_Camera = new THREE.PerspectiveCamera( 55.0, WINDOW.ms_Width / WINDOW.ms_Height, 0.5, 30000 );
 		this.ms_Camera.position.set( inParameters.width / 2, Math.max( inParameters.width, inParameters.height ) / 1.5, -inParameters.height / 1.5 );
 		this.ms_Camera.lookAt( new THREE.Vector3( 0, 0, 0 ) );
 		
-		this.ms_Renderer.shadowMapEnabled = true;
-		this.ms_Renderer.shadowMapSoft = true;
-		
 		// Initialize Orbit control		
 		this.ms_Controls = new THREE.OrbitControls( this.ms_Camera, this.ms_Renderer.domElement );
-		this.ms_Controls.addEventListener( 'change', function() { DEMO.Display(); } );
 	
 		// Add light
-		var directionalLight = new THREE.DirectionalLight( 0xffffff, 1 );
-		directionalLight.position.set( 0.5, 0.7, 0.75 );
-		directionalLight.castShadow = true;
-		directionalLight.shadowDarkness = 0.5;
+		var directionalLight = new THREE.DirectionalLight( 0xffffff, 1.3 );
+		directionalLight.position.set( 500, 700, 750 );
 		this.ms_Scene.add( directionalLight );
 		
 		// Create terrain
 		this.Load( inParameters );
+		
+		// Load textures
+		var noiseTexture = new THREE.ImageUtils.loadTexture( 'images/cloud.png' );
+		noiseTexture.wrapS = noiseTexture.wrapT = THREE.RepeatWrapping; 
+		
+		// Create the water effect
+		this.ms_Water = new THREE.Water( this.ms_Renderer, this.ms_Camera, {
+			clipBias: 0.0, 
+			textureWidth: 1024, textureHeight: 1024, 
+			color: 0x555555, 
+			baseTexture: THREE.ImageUtils.loadTexture("images/water.jpg"),
+			baseSpeed: 1.15,
+			noiseTexture: new THREE.ImageUtils.loadTexture( 'images/cloud.png' ),
+			noiseScale: 0.2,
+			alpha: 	1.0,
+			time: 	0.0,
+		} );
+		var aMeshMirror = new THREE.Mesh(
+			new THREE.PlaneGeometry( inParameters.width * 2, inParameters.height * 2, 50, 50 ), 
+			this.ms_Water.material
+		);
+		aMeshMirror.add( this.ms_Water );
+		aMeshMirror.rotation.x = - Math.PI * 0.5;
+		aMeshMirror.position.y = - inParameters.depth * 0.2;
+		this.ms_Scene.add( aMeshMirror );
+	
+		/*
+		var skyBoxGeometry = new THREE.CubeGeometry( 10000, 10000, 10000 );
+		var skyBoxMaterial = new THREE.MeshBasicMaterial( { color: 0x9999ff, side: THREE.BackSide } );
+		var skyBox = new THREE.Mesh( skyBoxGeometry, skyBoxMaterial );
+		this.ms_Scene.add(skyBox);
+		*/
 	},
 	
 	Load: function( inParameters )
 	{
 		var terrainGeo = TERRAINGEN.Get( inParameters );
-		var terrainMaterial = new THREE.MeshPhongMaterial( { vertexColors: THREE.VertexColors , shading: THREE.FlatShading } );
+		var terrainMaterial = new THREE.MeshPhongMaterial( { vertexColors: THREE.VertexColors, shading: THREE.FlatShading } );
 		
 		var terrain = new THREE.Mesh( terrainGeo, terrainMaterial );
 		terrain.position.y = - inParameters.depth / 2;
@@ -62,18 +89,19 @@ var DEMO =
 		this.ms_Terrain = terrain;
 		this.ms_Terrain.castShadow = true;
 		this.ms_Terrain.receiveShadow = true;
-		this.Display();
-		
 	},
 	
 	Display: function()
 	{
+		this.ms_Water.render();
 		this.ms_Renderer.render( this.ms_Scene, this.ms_Camera );
 	},
 	
 	Update: function()
 	{
+		this.ms_Water.material.uniforms.time.value += 0.013;
 		this.ms_Controls.update();
+		this.Display();
 	},
 	
 	Resize: function( inWidth, inHeight )
