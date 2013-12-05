@@ -24,7 +24,6 @@ Use of the adaptation of the flat mirror implementation to provide a water effec
 
 - Jonas Wagner - http://29a.ch/
 The real rendering come from here : http://29a.ch/slides/2012/webglwater, an explanation on how to render water. With some adaptation of its shader, results are here.
-http://29a.ch/slides/2012/webglwater
 
 ### Screenshot
 
