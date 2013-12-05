@@ -93,7 +93,7 @@ THREE.ShaderLib['water'] = {
 		
 		'	float distance = length(worldToEye);',
 
-		'	vec2 distortion = surfaceNormal.xz * min( distance * 0.0001, 0.02);',
+		'	vec2 distortion = surfaceNormal.xz * min( distance * 0.0002, 0.04);',
 		'	vec3 reflectionSample = vec3( texture2D( mirrorSampler, mirrorCoord.xy / mirrorCoord.z + distortion ) );',
 
 		'	float theta = max( dot( eyeDirection, surfaceNormal ), 0.0 );',

@@ -34,6 +34,7 @@ var DEMO =
 		// Initialize Orbit control		
 		this.ms_Controls = new THREE.OrbitControls( this.ms_Camera, this.ms_Renderer.domElement );
 		this.ms_Controls.userPan = false;
+		this.ms_Controls.userPanSpeed = 0.0;
 		this.ms_Controls.maxDistance = 5000.0;
 		this.ms_Controls.maxPolarAngle = Math.PI * 0.495;
 	
