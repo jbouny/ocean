@@ -1,7 +1,10 @@
 /**
- * @author Slayvin / http://slayvin.net
- * @author Stemkoski / http://www.adelphi.edu/~stemkoski
  * @author jbouny / https://github.com/jbouny
+ *
+ * Work based on :
+ * @author Slayvin / http://slayvin.net : Flat mirror for three.js
+ * @author Stemkoski / http://www.adelphi.edu/~stemkoski : An implementation of water shader based on the flat mirror
+ * @author Jonas Wagner / http://29a.ch/ && http://29a.ch/slides/2012/webglwater/ : Water shader explanations in WebGL
  */
 
 THREE.ShaderLib['water'] = {
@@ -29,18 +32,11 @@ THREE.ShaderLib['water'] = {
 		'uniform float time;',
 
 		'void main()',
-		'{',					
-		'	vec2 uvTimeShift = uv + vec2( 1.1, 1.9 ) * time * 0.15;',
-		'	vec4 bumpData = texture2D( noiseTexture, uvTimeShift );',
-		'	float displacement = ( bumpData.g - 0.5 ) * 10.0;',
-		'	vec3 bumpedPosition = position + normal * displacement;',
-	
-		'	vec4 worldPosition4 = modelMatrix * vec4( position, 1.0 );',
-		'	worldPosition = vec3( worldPosition4 );',
-		'	vec4 mvPosition = modelViewMatrix * vec4( bumpedPosition, 1.0 );',
-		'	mirrorCoord = textureMatrix * modelMatrix * vec4( position, 1.0 );',
-
-		'	projectedPosition = gl_Position = projectionMatrix * mvPosition;',
+		'{',
+		'	mirrorCoord = modelMatrix * vec4( position, 1.0 );',
+		'	worldPosition = vec3( mirrorCoord );',
+		'	mirrorCoord = textureMatrix * mirrorCoord;',
+		'	projectedPosition = gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );',
 		'}'
 	].join('\n'),
 
@@ -62,17 +58,17 @@ THREE.ShaderLib['water'] = {
 		'varying vec3 worldPosition;',
 		'varying vec4 projectedPosition;',
 		
-		'vec4 getNoise(vec2 uv)',
+		'vec4 getNoise( vec2 uv )',
 		'{',
-		'	vec2 uv0 = (uv/103.0)+vec2(time/17.0, time/29.0);',
-		'	vec2 uv1 = uv/107.0-vec2(time/-19.0, time/31.0);',
-		'	vec2 uv2 = uv/vec2(897.0, 983.0)+vec2(time/101.0, time/97.0);',
-		'	vec2 uv3 = uv/vec2(991.0, 877.0)-vec2(time/109.0, time/-113.0);',
-		'	vec4 noise = (texture2D(normalSampler, uv0)) +',
-        '		(texture2D(normalSampler, uv1)) +',
-        '		(texture2D(normalSampler, uv2)) +',
-		'		(texture2D(normalSampler, uv3));',
-		'	return noise*0.5-1.0;',
+		'	vec2 uv0 = ( uv / 103.0 ) + vec2(time / 17.0, time / 29.0);',
+		'	vec2 uv1 = uv / 107.0-vec2( time / -19.0, time / 31.0 );',
+		'	vec2 uv2 = uv / vec2( 8907.0, 9803.0 ) + vec2( time / 101.0, time / 97.0 );',
+		'	vec2 uv3 = uv / vec2( 1091.0, 1027.0 ) - vec2( time / 109.0, time / -113.0 );',
+		'	vec4 noise = ( texture2D( normalSampler, uv0 ) ) +',
+        '		( texture2D( normalSampler, uv1 ) ) +',
+        '		( texture2D( normalSampler, uv2 ) ) +',
+		'		( texture2D( normalSampler, uv3 ) );',
+		'	return noise * 0.5 - 1.0;',
 		'}',
 		
 		'void sunLight( const vec3 surfaceNormal, const vec3 eyeDirection, float shiny, float spec, float diffuse, inout vec3 diffuseColor, inout vec3 specularColor )',
@@ -181,7 +177,6 @@ THREE.Water = function ( renderer, camera, options ) {
 	this.material.uniforms.sunColor.value = this.sunColor;
 	this.material.uniforms.waterColor.value = this.waterColor;
 	this.material.uniforms.sunDirection.value = this.sunDirection;
-	console.log( this.sunDirection );
 	
 	this.material.uniforms.eye.value = this.eye;
 	
@@ -192,7 +187,6 @@ THREE.Water = function ( renderer, camera, options ) {
 
 	this.updateTextureMatrix();
 	this.render();
-
 };
 
 THREE.Water.prototype = Object.create( THREE.Object3D.prototype );

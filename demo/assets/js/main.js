@@ -12,15 +12,14 @@ $( function() {
 		generator: PN_GENERATOR,
 		width: 2000,
 		height: 2000,
-		widthSegments: 200,
-		heightSegments: 200,
-		depth: 2000,
+		widthSegments: 250,
+		heightSegments: 250,
+		depth: 1500,
 		param: 4,
 		filterparam: 1,
 		filter: [ CIRCLE_FILTER ],
 		postgen: [ MOUNTAINS_COLORS ],
-		effect: [ DESTRUCTURE_EFFECT ],
-		canvas: document.getElementById('heightmap'),
+		effect: [ DESTRUCTURE_EFFECT ]
 	};
 	
 	DEMO.Initialize( 'canvas-3d', parameters );

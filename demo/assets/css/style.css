@@ -5,12 +5,3 @@ body {
 	color : #fff;
 	overflow: hidden;
 }
-
-#heightmap {
-	position : absolute;
-	top : 5px;
-	left : 5px;
-	display: none;
-}
-
-.property-name a { color : #eee; }
