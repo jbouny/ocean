@@ -11,7 +11,6 @@ THREE.ShaderLib['water'] = {
 
 	uniforms: { "normalSampler": { type: "t", value: null },
 				"mirrorSampler": { type: "t", value: null },
-				"noiseTexture": { type: "t", value: null },
 				"alpha": 		{ type: "f", value: 1.0 },
 				"time": 		{ type: "f", value: 0.0 },
 				"textureMatrix" : { type: "m4", value: new THREE.Matrix4() },
@@ -23,14 +22,12 @@ THREE.ShaderLib['water'] = {
 
 	vertexShader: [
 		'uniform mat4 textureMatrix;',
+		'uniform float time;',
 
 		'varying vec4 mirrorCoord;',
 		'varying vec3 worldPosition;',
 		'varying vec4 projectedPosition;',
 		
-		'uniform sampler2D noiseTexture;',
-		'uniform float time;',
-
 		'void main()',
 		'{',
 		'	mirrorCoord = modelMatrix * vec4( position, 1.0 );',
@@ -44,10 +41,8 @@ THREE.ShaderLib['water'] = {
 		'precision highp float;',
 		
 		'uniform sampler2D mirrorSampler;',
-		'uniform sampler2D noiseTexture;',
 		'uniform float alpha;',
 		'uniform float time;',
-		
 		'uniform sampler2D normalSampler;',
 		'uniform vec3 sunColor;',
 		'uniform vec3 sunDirection;',
@@ -124,7 +119,6 @@ THREE.Water = function ( renderer, camera, options ) {
 	var width = options.textureWidth !== undefined ? options.textureWidth : 512;
 	var height = options.textureHeight !== undefined ? options.textureHeight : 512;
 	this.clipBias = options.clipBias !== undefined ? options.clipBias : 0.0;
-	this.noiseTexture = options.noiseTexture !== undefined ? options.noiseTexture : null;
 	this.alpha = options.alpha !== undefined ? options.alpha : 1.0;
 	this.time = options.time !== undefined ? options.time : 0.0;
 	this.normalSampler = options.waterNormals !== undefined ? options.waterNormals : null;
@@ -169,7 +163,6 @@ THREE.Water = function ( renderer, camera, options ) {
 
 	this.material.uniforms.mirrorSampler.value = this.texture;
 	this.material.uniforms.textureMatrix.value = this.textureMatrix;
-	this.material.uniforms.noiseTexture.value = this.noiseTexture;
 	this.material.uniforms.alpha.value = this.alpha;
 	this.material.uniforms.time.value = this.time;
 	
