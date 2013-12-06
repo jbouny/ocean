@@ -9,15 +9,15 @@
 
 THREE.ShaderLib['water'] = {
 
-	uniforms: { "normalSampler": { type: "t", value: null },
-				"mirrorSampler": { type: "t", value: null },
-				"alpha": 		{ type: "f", value: 1.0 },
-				"time": 		{ type: "f", value: 0.0 },
-				"textureMatrix" : { type: "m4", value: new THREE.Matrix4() },
-				"sunColor": 	{ type: "c", value: new THREE.Color( 0x7F7F7F ) },
-				"sunDirection": { type: "v3", value: new THREE.Vector3( 0.70707, 0.70707, 0 ) },
-				"eye": 			{ type: "v3", value: new THREE.Vector3( 0, 0, 0 ) },
-				"waterColor":	{ type: "c", value: new THREE.Color( 0x555555 ) }
+	uniforms: { "normalSampler":	{ type: "t", value: null },
+				"mirrorSampler":	{ type: "t", value: null },
+				"alpha":			{ type: "f", value: 1.0 },
+				"time":				{ type: "f", value: 0.0 },
+				"textureMatrix" :	{ type: "m4", value: new THREE.Matrix4() },
+				"sunColor":			{ type: "c", value: new THREE.Color( 0x7F7F7F ) },
+				"sunDirection":		{ type: "v3", value: new THREE.Vector3( 0.70707, 0.70707, 0 ) },
+				"eye":				{ type: "v3", value: new THREE.Vector3( 0, 0, 0 ) },
+				"waterColor":		{ type: "c", value: new THREE.Color( 0x555555 ) }
 	},
 
 	vertexShader: [
@@ -31,7 +31,7 @@ THREE.ShaderLib['water'] = {
 		'void main()',
 		'{',
 		'	mirrorCoord = modelMatrix * vec4( position, 1.0 );',
-		'	worldPosition = vec3( mirrorCoord );',
+		'	worldPosition = mirrorCoord.xyz;',
 		'	mirrorCoord = textureMatrix * mirrorCoord;',
 		'	projectedPosition = gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );',
 		'}'

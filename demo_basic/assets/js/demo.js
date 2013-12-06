@@ -17,7 +17,7 @@ var DEMO =
 		catch( e ) { return false; } 
 	} )(),
 	
-	Initialize: function( inIdCanvas, inParameters )
+	Initialize: function( inIdCanvas )
 	{
 		this.ms_Canvas = $( '#'+inIdCanvas );
 		
@@ -27,23 +27,16 @@ var DEMO =
 		this.ms_Scene = new THREE.Scene();
 		
 		this.ms_Camera = new THREE.PerspectiveCamera( 55.0, WINDOW.ms_Width / WINDOW.ms_Height, 0.5, 3000000 );
-		this.ms_Camera.position.set( 0, Math.max( inParameters.width * 1.5, inParameters.height ) / 8, -inParameters.height );
+		this.ms_Camera.position.set( 1000, 500, -1500 );
 		this.ms_Camera.lookAt( new THREE.Vector3( 0, 0, 0 ) );
 		
 		// Initialize Orbit control		
 		this.ms_Controls = new THREE.OrbitControls( this.ms_Camera, this.ms_Renderer.domElement );
-		this.ms_Controls.userPan = false;
-		this.ms_Controls.userPanSpeed = 0.0;
-		this.ms_Controls.maxDistance = 5000.0;
-		this.ms_Controls.maxPolarAngle = Math.PI * 0.495;
 	
 		// Add light
 		var directionalLight = new THREE.DirectionalLight( 0xffff55, 1 );
 		directionalLight.position.set( -600, 300, 600 );
 		this.ms_Scene.add( directionalLight );
-		
-		// Create terrain
-		this.LoadTerrain( inParameters );
 		
 		// Load textures		
 		var waterNormals = new THREE.ImageUtils.loadTexture( '../textures/waternormals.jpg' );
@@ -60,7 +53,7 @@ var DEMO =
 			waterColor: 0x001e0f,
 		} );
 		var aMeshMirror = new THREE.Mesh(
-			new THREE.PlaneGeometry( inParameters.width * 500, inParameters.height * 500, 50, 50 ), 
+			new THREE.PlaneGeometry( 2000, 2000, 10, 10 ), 
 			this.ms_Water.material
 		);
 		aMeshMirror.add( this.ms_Water );
@@ -73,12 +66,12 @@ var DEMO =
 	LoadSkyBox: function()
 	{
 		var aCubeMap = THREE.ImageUtils.loadTextureCube( [
-		  'assets/img/px.jpg',
-		  'assets/img/nx.jpg',
-		  'assets/img/py.jpg',
-		  'assets/img/ny.jpg',
-		  'assets/img/pz.jpg',
-		  'assets/img/nz.jpg'
+		  '../demo/assets/img/px.jpg',
+		  '../demo/assets/img/nx.jpg',
+		  '../demo/assets/img/py.jpg',
+		  '../demo/assets/img/ny.jpg',
+		  '../demo/assets/img/pz.jpg',
+		  '../demo/assets/img/nz.jpg'
 		] );
 		aCubeMap.format = THREE.RGBFormat;
 
@@ -99,16 +92,6 @@ var DEMO =
 		);
 		
 		this.ms_Scene.add( aSkybox );
-	},
-	
-	LoadTerrain: function( inParameters )
-	{
-		var terrainGeo = TERRAINGEN.Get( inParameters );
-		var terrainMaterial = new THREE.MeshPhongMaterial( { vertexColors: THREE.VertexColors, shading: THREE.FlatShading, side: THREE.DoubleSide } );
-		
-		var terrain = new THREE.Mesh( terrainGeo, terrainMaterial );
-		terrain.position.y = - inParameters.depth * 0.4;
-		this.ms_Scene.add( terrain );
 	},
 	
 	Display: function()
