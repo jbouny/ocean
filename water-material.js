@@ -13,6 +13,7 @@ THREE.ShaderLib['water'] = {
 				"mirrorSampler":	{ type: "t", value: null },
 				"alpha":			{ type: "f", value: 1.0 },
 				"time":				{ type: "f", value: 0.0 },
+				"distortionScale":	{ type: "f", value: 20.0 },
 				"textureMatrix" :	{ type: "m4", value: new THREE.Matrix4() },
 				"sunColor":			{ type: "c", value: new THREE.Color( 0x7F7F7F ) },
 				"sunDirection":		{ type: "v3", value: new THREE.Vector3( 0.70707, 0.70707, 0 ) },
@@ -42,6 +43,7 @@ THREE.ShaderLib['water'] = {
 		'uniform sampler2D mirrorSampler;',
 		'uniform float alpha;',
 		'uniform float time;',
+		'uniform float distortionScale;',
 		'uniform sampler2D normalSampler;',
 		'uniform vec3 sunColor;',
 		'uniform vec3 sunDirection;',
@@ -86,7 +88,7 @@ THREE.ShaderLib['water'] = {
 		
 		'	float distance = length(worldToEye);',
 
-		'	vec2 distortion = surfaceNormal.xz * ( 0.05 + max( 1.0 / distance * 20.0, 0.0 ) );',
+		'	vec2 distortion = surfaceNormal.xz * ( 0.05 + 1.0 / distance * distortionScale );',
 		'	vec3 reflectionSample = vec3( texture2D( mirrorSampler, mirrorCoord.xy / mirrorCoord.z + distortion ) );',
 
 		'	float theta = max( dot( eyeDirection, surfaceNormal ), 0.0 );',
@@ -113,16 +115,17 @@ THREE.Water = function ( renderer, camera, scene, options ) {
 	
 	this.matrixNeedsUpdate = true;
 	
-	var width = options.textureWidth !== undefined ? options.textureWidth : 512;
-	var height = options.textureHeight !== undefined ? options.textureHeight : 512;
-	this.clipBias = options.clipBias !== undefined ? options.clipBias : 0.0;
-	this.alpha = options.alpha !== undefined ? options.alpha : 1.0;
-	this.time = options.time !== undefined ? options.time : 0.0;
-	this.normalSampler = options.waterNormals !== undefined ? options.waterNormals : null;
-	this.sunDirection = options.sunDirection !== undefined ? options.sunDirection : new THREE.Vector3( 0.70707, 0.70707, 0.0 );
-	this.sunColor = options.sunColor !== undefined ? new THREE.Color( options.sunColor ) : new THREE.Color( 0x7F7F7F );
-	this.waterColor = options.waterColor !== undefined ? new THREE.Color( options.waterColor ) : new THREE.Color( 0x7F7F7F );
-	this.eye = options.eye !== undefined ? options.eye : new THREE.Vector3( 0, 0, 0 );
+	var width = options.textureWidth || 512;
+	var height = options.textureHeight || 512;
+	this.clipBias = options.clipBias || 0.0;
+	this.alpha = options.alpha || 1.0;
+	this.time = options.time || 0.0;
+	this.normalSampler = options.waterNormals || null;
+	this.sunDirection = options.sunDirection || new THREE.Vector3( 0.70707, 0.70707, 0.0 );
+	this.sunColor = options.sunColor || new THREE.Color( 0x7F7F7F );
+	this.waterColor = options.waterColor || new THREE.Color( 0x7F7F7F );
+	this.eye = options.eye || new THREE.Vector3( 0, 0, 0 );
+	this.distortionScale = options.distortionScale || 20.0;
 	
 	this.renderer = renderer;
 	this.scene = scene;
@@ -131,7 +134,7 @@ THREE.Water = function ( renderer, camera, scene, options ) {
 	this.mirrorWorldPosition = new THREE.Vector3();
 	this.cameraWorldPosition = new THREE.Vector3();
 	this.rotationMatrix = new THREE.Matrix4();
-	this.lookAtPosition = new THREE.Vector3(0, 0, -1);
+	this.lookAtPosition = new THREE.Vector3( 0, 0, -1 );
 	this.clipPlane = new THREE.Vector4();
 	
 	if ( camera instanceof THREE.PerspectiveCamera )
@@ -163,15 +166,16 @@ THREE.Water = function ( renderer, camera, scene, options ) {
 	this.material.uniforms.textureMatrix.value = this.textureMatrix;
 	this.material.uniforms.alpha.value = this.alpha;
 	this.material.uniforms.time.value = this.time;
-	
 	this.material.uniforms.normalSampler.value = this.normalSampler;
 	this.material.uniforms.sunColor.value = this.sunColor;
 	this.material.uniforms.waterColor.value = this.waterColor;
 	this.material.uniforms.sunDirection.value = this.sunDirection;
+	this.material.uniforms.distortionScale.value = this.distortionScale;
 	
 	this.material.uniforms.eye.value = this.eye;
 	
-	if ( !isPowerOfTwo(width) || !isPowerOfTwo(height) ) {
+	if ( !isPowerOfTwo(width) || !isPowerOfTwo(height) ) 
+	{
 		this.texture.generateMipmaps = false;
 		this.tempTexture.generateMipmaps = false;
 	}
