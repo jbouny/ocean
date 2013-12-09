@@ -39,7 +39,7 @@ var DEMO =
 		this.ms_Scene.add( directionalLight );
 		
 		// Load textures		
-		var waterNormals = new THREE.ImageUtils.loadTexture( '../textures/waternormals.jpg' );
+		var waterNormals = new THREE.ImageUtils.loadTexture( '../assets/img/waternormals.jpg' );
 		waterNormals.wrapS = waterNormals.wrapT = THREE.RepeatWrapping; 
 		
 		// Create the water effect

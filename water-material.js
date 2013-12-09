@@ -96,7 +96,6 @@ THREE.ShaderLib['water'] = {
 		'	float reflectance = rf0 + ( 1.0 - rf0 ) * pow( ( 1.0 - theta ), 5.0 );',
 		'	vec3 scatter = max( 0.0, dot( surfaceNormal, eyeDirection ) ) * waterColor;',
 		'	vec3 albedo = mix( sunColor * diffuseLight * 0.3 + scatter, ( vec3( 0.1 ) + reflectionSample * 0.9 + reflectionSample * specularLight ), reflectance );',
-		'	gl_FragColor = vec4(albedo, min( 1.0 / ( 1.0 + distance ) * 50000.0 * theta, alpha ) );',
 		'	gl_FragColor = vec4(albedo, alpha );',
 		'}'
 	].join('\n')
