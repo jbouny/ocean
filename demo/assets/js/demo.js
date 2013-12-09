@@ -6,6 +6,7 @@ var DEMO =
 	ms_Scene: null, 
 	ms_Controls: null,
 	ms_Water: null,
+	ms_FilesDND: null,
 	
 	Enable: ( function() 
 	{
@@ -48,6 +49,17 @@ var DEMO =
 		// Load textures		
 		var waterNormals = new THREE.ImageUtils.loadTexture( '../textures/waternormals.jpg' );
 		waterNormals.wrapS = waterNormals.wrapT = THREE.RepeatWrapping; 
+		
+		// Load filesdnd texture
+		new Konami( function() {
+			if( DEMO.ms_FilesDND == null )
+			{
+				var aTextureFDND = THREE.ImageUtils.loadTexture( "assets/img/filesdnd.png" );
+				DEMO.ms_FilesDND = new THREE.Mesh( new THREE.PlaneGeometry( 1000, 1000 ), new THREE.MeshBasicMaterial( { map : aTextureFDND, transparent: true, side : THREE.DoubleSide } ) );
+				DEMO.ms_FilesDND.position.y = 1000;
+				DEMO.ms_Scene.add( DEMO.ms_FilesDND );
+			}
+		} );
 		
 		// Create the water effect
 		this.ms_Water = new THREE.Water( this.ms_Renderer, this.ms_Camera, {
