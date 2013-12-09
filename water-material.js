@@ -26,14 +26,13 @@ THREE.ShaderLib['water'] = {
 
 		'varying vec4 mirrorCoord;',
 		'varying vec3 worldPosition;',
-		'varying vec4 projectedPosition;',
 		
 		'void main()',
 		'{',
 		'	mirrorCoord = modelMatrix * vec4( position, 1.0 );',
 		'	worldPosition = mirrorCoord.xyz;',
 		'	mirrorCoord = textureMatrix * mirrorCoord;',
-		'	projectedPosition = gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );',
+		'	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );',
 		'}'
 	].join('\n'),
 
@@ -51,7 +50,6 @@ THREE.ShaderLib['water'] = {
 
 		'varying vec4 mirrorCoord;',
 		'varying vec3 worldPosition;',
-		'varying vec4 projectedPosition;',
 		
 		'vec4 getNoise( vec2 uv )',
 		'{',
@@ -88,7 +86,7 @@ THREE.ShaderLib['water'] = {
 		
 		'	float distance = length(worldToEye);',
 
-		'	vec2 distortion = surfaceNormal.xz * min( distance * 0.0002, 0.04);',
+		'	vec2 distortion = surfaceNormal.xz * ( 0.05 + max( 1.0 / distance * 20.0, 0.0 ) );',
 		'	vec3 reflectionSample = vec3( texture2D( mirrorSampler, mirrorCoord.xy / mirrorCoord.z + distortion ) );',
 
 		'	float theta = max( dot( eyeDirection, surfaceNormal ), 0.0 );',
@@ -96,13 +94,13 @@ THREE.ShaderLib['water'] = {
 		'	float reflectance = rf0 + ( 1.0 - rf0 ) * pow( ( 1.0 - theta ), 5.0 );',
 		'	vec3 scatter = max( 0.0, dot( surfaceNormal, eyeDirection ) ) * waterColor;',
 		'	vec3 albedo = mix( sunColor * diffuseLight * 0.3 + scatter, ( vec3( 0.1 ) + reflectionSample * 0.9 + reflectionSample * specularLight ), reflectance );',
-		'	gl_FragColor = vec4(albedo, alpha );',
+		'	gl_FragColor = vec4( albedo, alpha );',
 		'}'
 	].join('\n')
 
 };
 
-THREE.Water = function ( renderer, camera, options ) {
+THREE.Water = function ( renderer, camera, scene, options ) {
 
 	THREE.Object3D.call( this );
 	this.name = 'water_' + this.id;
@@ -127,6 +125,7 @@ THREE.Water = function ( renderer, camera, options ) {
 	this.eye = options.eye !== undefined ? options.eye : new THREE.Vector3( 0, 0, 0 );
 	
 	this.renderer = renderer;
+	this.scene = scene;
 	this.mirrorPlane = new THREE.Plane();
 	this.normal = new THREE.Vector3( 0, 0, 1 );
 	this.mirrorWorldPosition = new THREE.Vector3();
@@ -134,7 +133,7 @@ THREE.Water = function ( renderer, camera, options ) {
 	this.rotationMatrix = new THREE.Matrix4();
 	this.lookAtPosition = new THREE.Vector3(0, 0, -1);
 	this.clipPlane = new THREE.Vector4();
-
+	
 	if ( camera instanceof THREE.PerspectiveCamera )
 		this.camera = camera;
 	else 
@@ -146,10 +145,10 @@ THREE.Water = function ( renderer, camera, options ) {
 	this.textureMatrix = new THREE.Matrix4();
 
 	this.mirrorCamera = this.camera.clone();
-
+	
 	this.texture = new THREE.WebGLRenderTarget( width, height );
 	this.tempTexture = new THREE.WebGLRenderTarget( width, height );
-
+	
 	var mirrorShader = THREE.ShaderLib[ "water" ];
 	var mirrorUniforms = THREE.UniformsUtils.clone( mirrorShader.uniforms );
 
@@ -285,41 +284,34 @@ THREE.Water.prototype.updateTextureMatrix = function () {
 	
 	this.eye = this.camera.position;
 	this.material.uniforms.eye.value = this.eye;
-
 };
 
 THREE.Water.prototype.render = function () {
 
-	if (this.matrixNeedsUpdate)
+	if( this.matrixNeedsUpdate )
 		this.updateTextureMatrix();
 
 	this.matrixNeedsUpdate = true;
 
 	// Render the mirrored view of the current scene into the target texture
-	var scene = this;
-	while ( scene.parent !== undefined ) {
-		scene = scene.parent;
+	if( this.scene !== undefined && this.scene instanceof THREE.Scene )
+	{
+        this.renderer.render( this.scene, this.mirrorCamera, this.texture, true );
 	}
-
-	if ( scene !== undefined && scene instanceof THREE.Scene)
-		this.renderer.render(scene, this.mirrorCamera, this.texture, true);
 
 };
 
 THREE.Water.prototype.renderTemp = function () {
 
-	if (this.matrixNeedsUpdate)
+	if( this.matrixNeedsUpdate )
 		this.updateTextureMatrix();
 
 	this.matrixNeedsUpdate = true;
 
 	// Render the mirrored view of the current scene into the target texture
-	var scene = this;
-	while ( scene.parent !== undefined ) {
-		scene = scene.parent;
+	if( this.scene !== undefined && this.scene instanceof THREE.Scene)
+	{
+		this.renderer.render( this.scene, this.mirrorCamera, this.tempTexture, true );
 	}
-
-	if ( scene !== undefined && scene instanceof THREE.Scene)
-		this.renderer.render(scene, this.mirrorCamera, this.tempTexture, true);
 
 };

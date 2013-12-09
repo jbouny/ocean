@@ -62,7 +62,7 @@ var DEMO =
 		} );
 		
 		// Create the water effect
-		this.ms_Water = new THREE.Water( this.ms_Renderer, this.ms_Camera, {
+		this.ms_Water = new THREE.Water( this.ms_Renderer, this.ms_Camera, this.ms_Scene, {
 			textureWidth: 512, 
 			textureHeight: 512,
 			waterNormals: waterNormals,
