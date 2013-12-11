@@ -35,7 +35,7 @@ var PN_GENERATOR =
 			var x = ( inParameters.alea.Random() * ( noise.width - size ) ) | 0,
 				y = ( inParameters.alea.Random() * ( noise.height - size ) ) | 0;
 			context.globalAlpha = 4 / size;
-			context.drawImage( noise, x, y, size * ratio, size, 0, 0, inParameters.widthSegments, inParameters.heightSegments );
+			context.drawImage( noise, Math.max( x, 0 ), y, size * ratio, size, 0, 0, inParameters.widthSegments, inParameters.heightSegments );
 		}
  
 		context.restore();

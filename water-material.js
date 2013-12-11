@@ -88,7 +88,7 @@ THREE.ShaderLib['water'] = {
 		
 		'	float distance = length(worldToEye);',
 
-		'	vec2 distortion = surfaceNormal.xz * ( 0.05 + 1.0 / distance * distortionScale );',
+		'	vec2 distortion = surfaceNormal.xz * ( 0.001 + 1.0 / distance ) * distortionScale;',
 		'	vec3 reflectionSample = vec3( texture2D( mirrorSampler, mirrorCoord.xy / mirrorCoord.z + distortion ) );',
 
 		'	float theta = max( dot( eyeDirection, surfaceNormal ), 0.0 );',
@@ -110,22 +110,25 @@ THREE.Water = function ( renderer, camera, scene, options ) {
 	function isPowerOfTwo ( value ) {
 		return ( value & ( value - 1 ) ) === 0;
 	};
+	function optionalParameter ( value, defaultValue ) {
+		return value !== undefined ? value : defaultValue;
+	};
 
 	options = options || {};
 	
 	this.matrixNeedsUpdate = true;
 	
-	var width = options.textureWidth || 512;
-	var height = options.textureHeight || 512;
-	this.clipBias = options.clipBias || 0.0;
-	this.alpha = options.alpha || 1.0;
-	this.time = options.time || 0.0;
-	this.normalSampler = options.waterNormals || null;
-	this.sunDirection = options.sunDirection || new THREE.Vector3( 0.70707, 0.70707, 0.0 );
-	this.sunColor = options.sunColor || new THREE.Color( 0x7F7F7F );
-	this.waterColor = options.waterColor || new THREE.Color( 0x7F7F7F );
-	this.eye = options.eye || new THREE.Vector3( 0, 0, 0 );
-	this.distortionScale = options.distortionScale || 20.0;
+	var width = optionalParameter( options.textureWidth, 512 );
+	var height = optionalParameter( options.textureHeight, 512 );
+	this.clipBias = optionalParameter( options.clipBias, 0.0 );
+	this.alpha = optionalParameter( options.alpha, 1.0 );
+	this.time = optionalParameter( options.time, 0.0 );
+	this.normalSampler = optionalParameter( options.waterNormals, null );
+	this.sunDirection = optionalParameter( options.sunDirection, new THREE.Vector3( 0.70707, 0.70707, 0.0 ) );
+	this.sunColor = new THREE.Color( optionalParameter( options.sunColor, 0xffffff ) );
+	this.waterColor = new THREE.Color( optionalParameter( options.waterColor, 0x7F7F7F ) );
+	this.eye = optionalParameter( options.eye, new THREE.Vector3( 0, 0, 0 ) );
+	this.distortionScale = optionalParameter( options.distortionScale, 20.0 );
 	
 	this.renderer = renderer;
 	this.scene = scene;
@@ -248,6 +251,7 @@ THREE.Water.prototype.updateTextureMatrix = function () {
 	this.mirrorCamera.position.copy(reflectView);
 	this.mirrorCamera.up = reflectUp;
 	this.mirrorCamera.lookAt(reflectTarget);
+	this.mirrorCamera.aspect = this.camera.aspect;
 
 	this.mirrorCamera.updateProjectionMatrix();
 	this.mirrorCamera.updateMatrixWorld();
@@ -286,7 +290,9 @@ THREE.Water.prototype.updateTextureMatrix = function () {
 	projectionMatrix.elements[10] = c.z + 1.0 - this.clipBias;
 	projectionMatrix.elements[14] = c.w;
 	
-	this.eye = this.camera.position;
+	var worldCoordinates = new THREE.Vector3();
+	worldCoordinates.getPositionFromMatrix( this.camera.matrixWorld );
+	this.eye = worldCoordinates;
 	this.material.uniforms.eye.value = this.eye;
 };
 
