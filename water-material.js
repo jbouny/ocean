@@ -14,6 +14,7 @@ THREE.ShaderLib['water'] = {
 				"alpha":			{ type: "f", value: 1.0 },
 				"time":				{ type: "f", value: 0.0 },
 				"distortionScale":	{ type: "f", value: 20.0 },
+				"noiseScale":		{ type: "f", value: 1.0 },
 				"textureMatrix" :	{ type: "m4", value: new THREE.Matrix4() },
 				"sunColor":			{ type: "c", value: new THREE.Color( 0x7F7F7F ) },
 				"sunDirection":		{ type: "v3", value: new THREE.Vector3( 0.70707, 0.70707, 0 ) },
@@ -44,6 +45,7 @@ THREE.ShaderLib['water'] = {
 		'uniform float alpha;',
 		'uniform float time;',
 		'uniform float distortionScale;',
+		'uniform float noiseScale;',
 		'uniform sampler2D normalSampler;',
 		'uniform vec3 sunColor;',
 		'uniform vec3 sunDirection;',
@@ -55,10 +57,10 @@ THREE.ShaderLib['water'] = {
 		
 		'vec4 getNoise( vec2 uv )',
 		'{',
-		'	vec2 uv0 = ( uv / 103.0 ) + vec2(time / 17.0, time / 29.0);',
-		'	vec2 uv1 = uv / 107.0-vec2( time / -19.0, time / 31.0 );',
-		'	vec2 uv2 = uv / vec2( 8907.0, 9803.0 ) + vec2( time / 101.0, time / 97.0 );',
-		'	vec2 uv3 = uv / vec2( 1091.0, 1027.0 ) - vec2( time / 109.0, time / -113.0 );',
+		'	vec2 uv0 = uv / ( 103.0 * noiseScale ) + vec2(time / 17.0, time / 29.0);',
+		'	vec2 uv1 = uv / ( 107.0 * noiseScale ) - vec2( time / -19.0, time / 31.0 );',
+		'	vec2 uv2 = uv / ( vec2( 8907.0, 9803.0 ) * noiseScale ) + vec2( time / 101.0, time /  097.0 );',
+		'	vec2 uv3 = uv / ( vec2( 1091.0, 1027.0 ) * noiseScale ) - vec2( time / 109.0, time / -113.0 );',
 		'	vec4 noise = ( texture2D( normalSampler, uv0 ) ) +',
         '		( texture2D( normalSampler, uv1 ) ) +',
         '		( texture2D( normalSampler, uv2 ) ) +',
@@ -129,6 +131,7 @@ THREE.Water = function ( renderer, camera, scene, options ) {
 	this.waterColor = new THREE.Color( optionalParameter( options.waterColor, 0x7F7F7F ) );
 	this.eye = optionalParameter( options.eye, new THREE.Vector3( 0, 0, 0 ) );
 	this.distortionScale = optionalParameter( options.distortionScale, 20.0 );
+	this.noiseScale = optionalParameter( options.noiseScale, 1.0 );
 	
 	this.renderer = renderer;
 	this.scene = scene;
@@ -174,6 +177,7 @@ THREE.Water = function ( renderer, camera, scene, options ) {
 	this.material.uniforms.waterColor.value = this.waterColor;
 	this.material.uniforms.sunDirection.value = this.sunDirection;
 	this.material.uniforms.distortionScale.value = this.distortionScale;
+	this.material.uniforms.noiseScale.value = this.noiseScale;
 	
 	this.material.uniforms.eye.value = this.eye;
 	
