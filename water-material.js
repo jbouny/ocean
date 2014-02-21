@@ -252,8 +252,8 @@ THREE.Water.prototype.updateTextureMatrix = function () {
 	this.updateMatrixWorld();
 	this.camera.updateMatrixWorld();
 
-	this.mirrorWorldPosition.getPositionFromMatrix( this.matrixWorld );
-	this.cameraWorldPosition.getPositionFromMatrix( this.camera.matrixWorld );
+	this.mirrorWorldPosition.setFromMatrixPosition( this.matrixWorld );
+	this.cameraWorldPosition.setFromMatrixPosition( this.camera.matrixWorld );
 
 	this.rotationMatrix.extractRotation( this.matrixWorld );
 
@@ -321,7 +321,7 @@ THREE.Water.prototype.updateTextureMatrix = function () {
 	projectionMatrix.elements[14] = c.w;
 	
 	var worldCoordinates = new THREE.Vector3();
-	worldCoordinates.getPositionFromMatrix( this.camera.matrixWorld );
+	worldCoordinates.setFromMatrixPosition( this.camera.matrixWorld );
 	this.eye = worldCoordinates;
 	this.material.uniforms.eye.value = this.eye;
 };
