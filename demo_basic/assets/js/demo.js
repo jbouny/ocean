@@ -51,13 +51,15 @@ var DEMO =
 			sunDirection: directionalLight.position.normalize(),
 			sunColor: 0xffffff,
 			waterColor: 0x001e0f,
+			betaVersion: 1
 		} );
 		var aMeshMirror = new THREE.Mesh(
-			new THREE.PlaneGeometry( 2000, 2000, 10, 10 ), 
+			new THREE.PlaneGeometry( 2000, 2000, 100, 100 ), 
 			this.ms_Water.material
 		);
 		aMeshMirror.add( this.ms_Water );
 		aMeshMirror.rotation.x = - Math.PI * 0.5;
+		
 		this.ms_Scene.add( aMeshMirror );
 	
 		this.LoadSkyBox();

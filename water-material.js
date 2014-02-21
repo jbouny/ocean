@@ -19,22 +19,46 @@ THREE.ShaderLib['water'] = {
 				"sunColor":			{ type: "c", value: new THREE.Color( 0x7F7F7F ) },
 				"sunDirection":		{ type: "v3", value: new THREE.Vector3( 0.70707, 0.70707, 0 ) },
 				"eye":				{ type: "v3", value: new THREE.Vector3( 0, 0, 0 ) },
-				"waterColor":		{ type: "c", value: new THREE.Color( 0x555555 ) }
+				"waterColor":		{ type: "c", value: new THREE.Color( 0x555555 ) },
+				"betaVersion":		{ type: "i", value: 0 }
 	},
 
 	vertexShader: [
 		'uniform mat4 textureMatrix;',
 		'uniform float time;',
+		'uniform float noiseScale;',
+		'uniform sampler2D normalSampler;',
+		'uniform int betaVersion;',
 
 		'varying vec4 mirrorCoord;',
 		'varying vec3 worldPosition;',
 		
+		'float getHeight( vec2 uv )',
+		'{',
+		'	vec2 uv0 = uv / ( 103.0 * noiseScale ) + vec2(time / 17.0, time / 29.0);',
+		'	vec2 uv1 = uv / ( 107.0 * noiseScale ) - vec2( time / -19.0, time / 31.0 );',
+		'	vec2 uv2 = uv / ( vec2( 8907.0, 9803.0 ) * noiseScale ) + vec2( time / 101.0, time /  097.0 );',
+		'	vec2 uv3 = uv / ( vec2( 1091.0, 1027.0 ) * noiseScale ) - vec2( time / 109.0, time / -113.0 );',
+		
+		'	vec4 t0 = texture2D( normalSampler, uv0 );',
+		'	vec4 t1 = texture2D( normalSampler, uv1 );',
+		'	vec4 t2 = texture2D( normalSampler, uv2 );',
+		'	vec4 t3 = texture2D( normalSampler, uv3 );',
+		
+		'	return ( t0.y * 103.0 + t1.y * 107.0 + t2.y * 9000.0 + t3.y * 1000.0 ) + 20000.0;',
+		'}',
+		
 		'void main()',
 		'{',
+		'	float height;',
 		'	mirrorCoord = modelMatrix * vec4( position, 1.0 );',
 		'	worldPosition = mirrorCoord.xyz;',
+		
 		'	mirrorCoord = textureMatrix * mirrorCoord;',
 		'	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );',
+		
+		'	if( betaVersion == 1 )', // This is just a really beta way to add movement on vertices, totally wrong, but fast to implement
+		'		gl_Position.y += getHeight( worldPosition.xz ) * 0.008;',
 		'}'
 	].join('\n'),
 
@@ -55,6 +79,14 @@ THREE.ShaderLib['water'] = {
 		'varying vec4 mirrorCoord;',
 		'varying vec3 worldPosition;',
 		
+		'void sunLight( const vec3 surfaceNormal, const vec3 eyeDirection, float shiny, float spec, float diffuse, inout vec3 diffuseColor, inout vec3 specularColor )',
+		'{',
+		'	vec3 reflection = normalize( reflect( -sunDirection, surfaceNormal ) );',
+		'	float direction = max( 0.0, dot( eyeDirection, reflection ) );',
+		'	specularColor += pow( direction, shiny ) * sunColor * spec;',
+		'	diffuseColor += max( dot( sunDirection, surfaceNormal ), 0.0 ) * sunColor * diffuse;',
+		'}',
+		
 		'vec4 getNoise( vec2 uv )',
 		'{',
 		'	vec2 uv0 = uv / ( 103.0 * noiseScale ) + vec2(time / 17.0, time / 29.0);',
@@ -66,14 +98,6 @@ THREE.ShaderLib['water'] = {
         '		( texture2D( normalSampler, uv2 ) ) +',
 		'		( texture2D( normalSampler, uv3 ) );',
 		'	return noise * 0.5 - 1.0;',
-		'}',
-		
-		'void sunLight( const vec3 surfaceNormal, const vec3 eyeDirection, float shiny, float spec, float diffuse, inout vec3 diffuseColor, inout vec3 specularColor )',
-		'{',
-		'	vec3 reflection = normalize( reflect( -sunDirection, surfaceNormal ) );',
-		'	float direction = max( 0.0, dot( eyeDirection, reflection ) );',
-		'	specularColor += pow( direction, shiny ) * sunColor * spec;',
-		'	diffuseColor += max( dot( sunDirection, surfaceNormal ), 0.0 ) * sunColor * diffuse;',
 		'}',
 		
 		'void main()',
@@ -132,6 +156,7 @@ THREE.Water = function ( renderer, camera, scene, options ) {
 	this.eye = optionalParameter( options.eye, new THREE.Vector3( 0, 0, 0 ) );
 	this.distortionScale = optionalParameter( options.distortionScale, 20.0 );
 	this.noiseScale = optionalParameter( options.noiseScale, 1.0 );
+	this.betaVersion = optionalParameter( options.betaVersion, 0 );
 	
 	this.renderer = renderer;
 	this.scene = scene;
@@ -178,6 +203,7 @@ THREE.Water = function ( renderer, camera, scene, options ) {
 	this.material.uniforms.sunDirection.value = this.sunDirection;
 	this.material.uniforms.distortionScale.value = this.distortionScale;
 	this.material.uniforms.noiseScale.value = this.noiseScale;
+	this.material.uniforms.betaVersion.value = this.betaVersion;
 	
 	this.material.uniforms.eye.value = this.eye;
 	
