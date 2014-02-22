@@ -7,7 +7,9 @@ It can be used to render water in some situations like complete ocean or small s
 ### Demos
 
 http://jeremybouny.fr/ocean/demo/
+
 http://jeremybouny.fr/ocean/demo_basic/
+
 http://jeremybouny.fr/ocean/demo_mobile/ <- only for smartphone and tablet, you can control the camera with these devices
 
 ### Dependencies
