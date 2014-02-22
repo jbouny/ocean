@@ -39,7 +39,7 @@ var DEMO =
 	
 		// Add light
 		var directionalLight = new THREE.DirectionalLight( 0xffff55, 1 );
-		directionalLight.position.set( -600, 300, 600 );
+		directionalLight.position.set( -400, 100, -500 );
 		this.ms_Scene.add( directionalLight );
 		
 		// Load textures		
@@ -101,7 +101,6 @@ var DEMO =
 		loader.load( 'assets/img/skybox_s.jpg', function ( image ) {
 
 			var getSide = function ( x, y ) {
-
 				var size = 512;
 
 				var canvas = document.createElement( 'canvas' );
@@ -112,7 +111,6 @@ var DEMO =
 				context.drawImage( image, - x * size, - y * size );
 
 				return canvas;
-
 			};
 
 			cubeMap.image[ 0 ] = getSide( 2, 1 ); // px
@@ -122,7 +120,6 @@ var DEMO =
 			cubeMap.image[ 4 ] = getSide( 1, 1 ); // pz
 			cubeMap.image[ 5 ] = getSide( 3, 1 ); // nz
 			cubeMap.needsUpdate = true;
-
 		} );
 
 		var cubeShader = THREE.ShaderLib['cube'];
@@ -140,7 +137,6 @@ var DEMO =
 			new THREE.CubeGeometry( 100000, 100000, 100000 ),
 			skyBoxMaterial
 		);
-		
 		this.ms_Scene.add( skyBox );
 	},
 	
