@@ -33,38 +33,37 @@ THREE.ShaderLib['water'] = {
 		'varying vec4 mirrorCoord;',
 		'varying vec3 worldPosition;',
 		
-		'float getHeight( vec2 uv )',
+		'float getHeight( in vec2 uv )',
 		'{',
 		'	vec2 uv0 = uv / ( 103.0 * noiseScale ) + vec2(time / 17.0, time / 29.0);',
 		'	vec2 uv1 = uv / ( 107.0 * noiseScale ) - vec2( time / -19.0, time / 31.0 );',
 		'	vec2 uv2 = uv / ( vec2( 8907.0, 9803.0 ) * noiseScale ) + vec2( time / 101.0, time /  097.0 );',
 		'	vec2 uv3 = uv / ( vec2( 1091.0, 1027.0 ) * noiseScale ) - vec2( time / 109.0, time / -113.0 );',
 		
-		'	vec4 t0 = texture2D( normalSampler, uv0 );',
-		'	vec4 t1 = texture2D( normalSampler, uv1 );',
-		'	vec4 t2 = texture2D( normalSampler, uv2 );',
-		'	vec4 t3 = texture2D( normalSampler, uv3 );',
+		'	float v0 = texture2D( normalSampler, uv0 ).y;',
+		'	float v1 = texture2D( normalSampler, uv1 ).y;',
+		'	float v2 = texture2D( normalSampler, uv2 ).y;',
+		'	float v3 = texture2D( normalSampler, uv3 ).y;',
 		
-		'	return ( t0.y * 103.0 + t1.y * 107.0 + t2.y * 9000.0 + t3.y * 1000.0 ) + 20000.0;',
+		'	return v0 * 103.0 + v1 * 107.0 + v2 * 9000.0 + v3 * 1000.0 + 20000.0;',
 		'}',
 		
 		'void main()',
 		'{',
-		'	float height;',
 		'	mirrorCoord = modelMatrix * vec4( position, 1.0 );',
 		'	worldPosition = mirrorCoord.xyz;',
 		
 		'	mirrorCoord = textureMatrix * mirrorCoord;',
 		'	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );',
 		
-		'	if( betaVersion == 1 )', // This is just a really beta way to add movement on vertices, totally wrong, but fast to implement
+		/*'	if( betaVersion > 0 )', // This is just a really beta way to add movement on vertices, totally wrong, but fast to implement
+		'	{',
 		'		gl_Position.y += getHeight( worldPosition.xz ) * 0.008;',
+		'	}',*/
 		'}'
 	].join('\n'),
 
-	fragmentShader: [
-		'precision highp float;',
-		
+	fragmentShader: [		
 		'uniform sampler2D mirrorSampler;',
 		'uniform float alpha;',
 		'uniform float time;',
@@ -79,7 +78,7 @@ THREE.ShaderLib['water'] = {
 		'varying vec4 mirrorCoord;',
 		'varying vec3 worldPosition;',
 		
-		'void sunLight( const vec3 surfaceNormal, const vec3 eyeDirection, float shiny, float spec, float diffuse, inout vec3 diffuseColor, inout vec3 specularColor )',
+		'void sunLight( const vec3 surfaceNormal, const vec3 eyeDirection, in float shiny, in float spec, in float diffuse, inout vec3 diffuseColor, inout vec3 specularColor )',
 		'{',
 		'	vec3 reflection = normalize( reflect( -sunDirection, surfaceNormal ) );',
 		'	float direction = max( 0.0, dot( eyeDirection, reflection ) );',
@@ -87,7 +86,7 @@ THREE.ShaderLib['water'] = {
 		'	diffuseColor += max( dot( sunDirection, surfaceNormal ), 0.0 ) * sunColor * diffuse;',
 		'}',
 		
-		'vec4 getNoise( vec2 uv )',
+		'vec4 getNoise( in vec2 uv )',
 		'{',
 		'	vec2 uv0 = uv / ( 103.0 * noiseScale ) + vec2(time / 17.0, time / 29.0);',
 		'	vec2 uv1 = uv / ( 107.0 * noiseScale ) - vec2( time / -19.0, time / 31.0 );',
@@ -130,6 +129,8 @@ THREE.ShaderLib['water'] = {
 
 THREE.Water = function ( renderer, camera, scene, options ) {
 
+	
+	$('#orientation').html('test1');
 	THREE.Object3D.call( this );
 	this.name = 'water_' + this.id;
 
@@ -175,6 +176,8 @@ THREE.Water = function ( renderer, camera, scene, options ) {
 		this.camera = new THREE.PerspectiveCamera();
 		console.log(this.name + ': camera is not a Perspective Camera!')
 	}
+	
+	$('#orientation').html('test2');
 
 	this.textureMatrix = new THREE.Matrix4();
 
@@ -215,6 +218,8 @@ THREE.Water = function ( renderer, camera, scene, options ) {
 
 	this.updateTextureMatrix();
 	this.render();
+	
+	$('#orientation').html('test3');
 };
 
 THREE.Water.prototype = Object.create( THREE.Object3D.prototype );
