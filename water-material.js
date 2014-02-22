@@ -128,9 +128,7 @@ THREE.ShaderLib['water'] = {
 };
 
 THREE.Water = function ( renderer, camera, scene, options ) {
-
 	
-	$('#orientation').html('test1');
 	THREE.Object3D.call( this );
 	this.name = 'water_' + this.id;
 
@@ -176,8 +174,6 @@ THREE.Water = function ( renderer, camera, scene, options ) {
 		this.camera = new THREE.PerspectiveCamera();
 		console.log(this.name + ': camera is not a Perspective Camera!')
 	}
-	
-	$('#orientation').html('test2');
 
 	this.textureMatrix = new THREE.Matrix4();
 
@@ -218,8 +214,6 @@ THREE.Water = function ( renderer, camera, scene, options ) {
 
 	this.updateTextureMatrix();
 	this.render();
-	
-	$('#orientation').html('test3');
 };
 
 THREE.Water.prototype = Object.create( THREE.Object3D.prototype );
