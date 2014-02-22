@@ -4,13 +4,15 @@ ocean - Realistic water shader for Three.js
 This project propose an implementation of a three.js shader to provide a realistic plane water effect.
 It can be used to render water in some situations like complete ocean or small surface of water in real time.
 
-### Demo
+### Demos
 
 http://jeremybouny.fr/ocean/demo/
+http://jeremybouny.fr/ocean/demo_basic/
+http://jeremybouny.fr/ocean/demo_mobile/ <- only for smartphone and tablet, you can control the camera with these devices
 
 ### Dependencies
 
-- Three.js r62 to render the scene : https://github.com/mrdoob/three.js/
+- Three.js r65 to render the scene : https://github.com/mrdoob/three.js/
 - JQuery 1.10.2 as a helper : https://github.com/jquery/jquery
 - Terrain-generator for procedural terrain generation : https://github.com/jbouny/terrain-generator
 
