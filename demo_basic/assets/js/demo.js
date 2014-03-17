@@ -42,14 +42,14 @@ var DEMO = {
 		
 		// Create the water effect
 		this.ms_Water = new THREE.Water(this.ms_Renderer, this.ms_Camera, this.ms_Scene, {
-			textureWidth: 512, 
-			textureHeight: 512,
+			textureWidth: 256,
+			textureHeight: 256,
 			waterNormals: waterNormals,
 			alpha: 	1.0,
 			sunDirection: directionalLight.position.normalize(),
 			sunColor: 0xffffff,
 			waterColor: 0x001e0f,
-			betaVersion: 1
+			betaVersion: 0
 		});
 		var aMeshMirror = new THREE.Mesh(
 			new THREE.PlaneGeometry(2000, 2000, 100, 100), 

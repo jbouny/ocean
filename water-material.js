@@ -16,10 +16,10 @@ THREE.ShaderLib['water'] = {
 				"distortionScale":	{ type: "f", value: 20.0 },
 				"noiseScale":		{ type: "f", value: 1.0 },
 				"textureMatrix" :	{ type: "m4", value: new THREE.Matrix4() },
-				"sunColor":			{ type: "c", value: new THREE.Color( 0x7F7F7F ) },
-				"sunDirection":		{ type: "v3", value: new THREE.Vector3( 0.70707, 0.70707, 0 ) },
-				"eye":				{ type: "v3", value: new THREE.Vector3( 0, 0, 0 ) },
-				"waterColor":		{ type: "c", value: new THREE.Color( 0x555555 ) },
+				"sunColor":			{ type: "c", value: new THREE.Color(0x7F7F7F) },
+				"sunDirection":		{ type: "v3", value: new THREE.Vector3(0.70707, 0.70707, 0) },
+				"eye":				{ type: "v3", value: new THREE.Vector3(0, 0, 0) },
+				"waterColor":		{ type: "c", value: new THREE.Color(0x555555) },
 				"betaVersion":		{ type: "i", value: 0 }
 	},
 
@@ -33,34 +33,32 @@ THREE.ShaderLib['water'] = {
 		'varying vec4 mirrorCoord;',
 		'varying vec3 worldPosition;',
 		
-		'precision mediump float;',
-		
-		'float getHeight( in vec2 uv )',
+		'float getHeight(in vec2 uv)',
 		'{',
-		'	vec2 uv0 = uv / ( 103.0 * noiseScale ) + vec2(time / 17.0, time / 29.0);',
-		'	vec2 uv1 = uv / ( 107.0 * noiseScale ) - vec2( time / -19.0, time / 31.0 );',
-		'	vec2 uv2 = uv / ( vec2( 8907.0, 9803.0 ) * noiseScale ) + vec2( time / 101.0, time /  097.0 );',
-		'	vec2 uv3 = uv / ( vec2( 1091.0, 1027.0 ) * noiseScale ) - vec2( time / 109.0, time / -113.0 );',
+		'	vec2 uv0 = uv / (103.0 * noiseScale) + vec2(time / 17.0, time / 29.0);',
+		'	vec2 uv1 = uv / (107.0 * noiseScale) - vec2(time / -19.0, time / 31.0);',
+		'	vec2 uv2 = uv / (vec2(8907.0, 9803.0) * noiseScale) + vec2(time / 101.0, time /  097.0);',
+		'	vec2 uv3 = uv / (vec2(1091.0, 1027.0) * noiseScale) - vec2(time / 109.0, time / -113.0);',
 		
-		'	float v0 = texture2D( normalSampler, uv0 ).y;',
-		'	float v1 = texture2D( normalSampler, uv1 ).y;',
-		'	float v2 = texture2D( normalSampler, uv2 ).y;',
-		'	float v3 = texture2D( normalSampler, uv3 ).y;',
+		'	float v0 = texture2D(normalSampler, uv0).y;',
+		'	float v1 = texture2D(normalSampler, uv1).y;',
+		'	float v2 = texture2D(normalSampler, uv2).y;',
+		'	float v3 = texture2D(normalSampler, uv3).y;',
 		
 		'	return v0 * 103.0 + v1 * 107.0 + v2 * 9000.0 + v3 * 1000.0 + 20000.0;',
 		'}',
 		
 		'void main()',
 		'{',
-		'	mirrorCoord = modelMatrix * vec4( position, 1.0 );',
+		'	mirrorCoord = modelMatrix * vec4(position, 1.0);',
 		'	worldPosition = mirrorCoord.xyz;',
 		
 		'	mirrorCoord = textureMatrix * mirrorCoord;',
-		'	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );',
+		'	gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);',
 		
-		/*'	if( betaVersion > 0 )', // This is just a really beta way to add movement on vertices, totally wrong, but fast to implement
+		/*'	if(betaVersion > 0)', // This is just a really beta way to add movement on vertices, totally wrong, but fast to implement
 		'	{',
-		'		gl_Position.y += getHeight( worldPosition.xz ) * 0.008;',
+		'		gl_Position.y += getHeight(worldPosition.xz) * 0.008;',
 		'	}',*/
 		'}'
 	].join('\n'),
@@ -80,64 +78,66 @@ THREE.ShaderLib['water'] = {
 		'varying vec4 mirrorCoord;',
 		'varying vec3 worldPosition;',
 		
-		'void sunLight( const vec3 surfaceNormal, const vec3 eyeDirection, in float shiny, in float spec, in float diffuse, inout vec3 diffuseColor, inout vec3 specularColor )',
+		'void sunLight(const vec3 surfaceNormal, const vec3 eyeDirection, in float shiny, in float spec, in float diffuse, inout vec3 diffuseColor, inout vec3 specularColor)',
 		'{',
-		'	vec3 reflection = normalize( reflect( -sunDirection, surfaceNormal ) );',
-		'	float direction = max( 0.0, dot( eyeDirection, reflection ) );',
-		'	specularColor += pow( direction, shiny ) * sunColor * spec;',
-		'	diffuseColor += max( dot( sunDirection, surfaceNormal ), 0.0 ) * sunColor * diffuse;',
+		'	vec3 reflection = normalize(reflect(-sunDirection, surfaceNormal));',
+		'	float direction = max(0.0, dot(eyeDirection, reflection));',
+		'	specularColor += pow(direction, shiny) * sunColor * spec;',
+		'	diffuseColor += max(dot(sunDirection, surfaceNormal), 0.0) * sunColor * diffuse;',
 		'}',
 		
-		'vec4 getNoise( in vec2 uv )',
+		'vec3 getNoise(in vec2 uv)',
 		'{',
-		'	vec2 uv0 = uv / ( 103.0 * noiseScale ) + vec2(time / 17.0, time / 29.0);',
-		'	vec2 uv1 = uv / ( 107.0 * noiseScale ) - vec2( time / -19.0, time / 31.0 );',
-		'	vec2 uv2 = uv / ( vec2( 8907.0, 9803.0 ) * noiseScale ) + vec2( time / 101.0, time /  097.0 );',
-		'	vec2 uv3 = uv / ( vec2( 1091.0, 1027.0 ) * noiseScale ) - vec2( time / 109.0, time / -113.0 );',
-		'	vec4 noise = ( texture2D( normalSampler, uv0 ) ) +',
-        '		( texture2D( normalSampler, uv1 ) ) +',
-        '		( texture2D( normalSampler, uv2 ) ) +',
-		'		( texture2D( normalSampler, uv3 ) );',
-		'	return noise * 0.5 - 1.0;',
+		'	vec2 uv0 = uv / (103.0 * noiseScale) + vec2(time / 17.0, time / 29.0);',
+		'	vec2 uv1 = uv / (107.0 * noiseScale) - vec2(time / -19.0, time / 31.0);',
+		'	vec2 uv2 = uv / (vec2(8907.0, 9803.0) * noiseScale) + vec2(time / 101.0, time /   97.0);',
+		'	vec2 uv3 = uv / (vec2(1091.0, 1027.0) * noiseScale) - vec2(time / 109.0, time / -113.0);',
+		'	vec4 noise = (texture2D(normalSampler, uv0)) +',
+        '		(texture2D(normalSampler, uv1)) +',
+        '		(texture2D(normalSampler, uv2)) +',
+		'		(texture2D(normalSampler, uv3));',
+		'	return noise.xzy * 0.5 - 1.0;',
 		'}',
 		
 		'void main()',
 		'{',
-		'	vec4 noise = getNoise( worldPosition.xz );',
-		'	vec3 surfaceNormal = normalize( noise.xzy * vec3( 1.5, 1.0, 1.5 ) );',
+		'	vec3 surfaceNormal = getNoise(worldPosition.xz);',
 
 		'	vec3 diffuseLight = vec3(0.0);',
 		'	vec3 specularLight = vec3(0.0);',
 
-		'	vec3 worldToEye = eye-worldPosition;',
-		'	vec3 eyeDirection = normalize( worldToEye );',
-		'	sunLight( surfaceNormal, eyeDirection, 100.0, 2.0, 0.5, diffuseLight, specularLight );',
+		'	vec3 worldToEye = eye - worldPosition;',
+		'	vec3 eyeDirection = normalize(worldToEye);',
+		'	sunLight(surfaceNormal, eyeDirection, 100.0, 2.0, 0.5, diffuseLight, specularLight);',
 		
 		'	float distance = length(worldToEye);',
 
-		'	vec2 distortion = surfaceNormal.xz * ( 0.001 + 1.0 / distance ) * distortionScale;',
-		'	vec3 reflectionSample = vec3( texture2D( mirrorSampler, mirrorCoord.xy / mirrorCoord.z + distortion ) );',
+		'	vec2 distortion = surfaceNormal.xz * (0.001 + 1.0 / distance) * distortionScale;',
+        '   vec4 mirrorDistord = mirrorCoord + vec4(surfaceNormal, 0.0);',
+        '   vec3 reflectionSample = texture2DProj(mirrorSampler, mirrorDistord).xyz;',
 
-		'	float theta = max( dot( eyeDirection, surfaceNormal ), 0.0 );',
-		'	float rf0 = 0.3;',
-		'	float reflectance = rf0 + ( 1.0 - rf0 ) * pow( ( 1.0 - theta ), 5.0 );',
-		'	vec3 scatter = max( 0.0, dot( surfaceNormal, eyeDirection ) ) * waterColor;',
-		'	vec3 albedo = mix( sunColor * diffuseLight * 0.3 + scatter, ( vec3( 0.1 ) + reflectionSample * 0.9 + reflectionSample * specularLight ), reflectance );',
-		'	gl_FragColor = vec4( albedo, alpha );',
+		'	float theta = max(dot(eyeDirection, surfaceNormal), 0.0);',
+		'	const float rf0 = 0.3;',
+		'	float reflectance = 0.3 + (1.0 - 0.3) * pow((1.0 - theta), 5.0);',
+		'	vec3 scatter = max(0.0, dot(surfaceNormal, eyeDirection)) * waterColor;',
+		'	vec3 albedo = mix(sunColor * diffuseLight * 0.3 + scatter, (vec3(0.1) + reflectionSample * 0.9 + reflectionSample * specularLight), reflectance);',
+        '   vec2 tmp = mirrorCoord.xy / mirrorCoord.z + distortion;',
+
+        '	gl_FragColor = vec4(albedo, alpha);',
 		'}'
 	].join('\n')
 
 };
 
-THREE.Water = function ( renderer, camera, scene, options ) {
+THREE.Water = function (renderer, camera, scene, options) {
 	
-	THREE.Object3D.call( this );
+	THREE.Object3D.call(this);
 	this.name = 'water_' + this.id;
 
-	function isPowerOfTwo ( value ) {
-		return ( value & ( value - 1 ) ) === 0;
+	function isPowerOfTwo (value) {
+		return (value & (value - 1)) === 0;
 	};
-	function optionalParameter ( value, defaultValue ) {
+	function optionalParameter (value, defaultValue) {
 		return value !== undefined ? value : defaultValue;
 	};
 
@@ -145,34 +145,33 @@ THREE.Water = function ( renderer, camera, scene, options ) {
 	
 	this.matrixNeedsUpdate = true;
 	
-	var width = optionalParameter( options.textureWidth, 512 );
-	var height = optionalParameter( options.textureHeight, 512 );
-	this.clipBias = optionalParameter( options.clipBias, 0.0 );
-	this.alpha = optionalParameter( options.alpha, 1.0 );
-	this.time = optionalParameter( options.time, 0.0 );
-	this.normalSampler = optionalParameter( options.waterNormals, null );
-	this.sunDirection = optionalParameter( options.sunDirection, new THREE.Vector3( 0.70707, 0.70707, 0.0 ) );
-	this.sunColor = new THREE.Color( optionalParameter( options.sunColor, 0xffffff ) );
-	this.waterColor = new THREE.Color( optionalParameter( options.waterColor, 0x7F7F7F ) );
-	this.eye = optionalParameter( options.eye, new THREE.Vector3( 0, 0, 0 ) );
-	this.distortionScale = optionalParameter( options.distortionScale, 20.0 );
-	this.noiseScale = optionalParameter( options.noiseScale, 1.0 );
-	this.betaVersion = optionalParameter( options.betaVersion, 0 );
+	var width = optionalParameter(options.textureWidth, 512);
+	var height = optionalParameter(options.textureHeight, 512);
+	this.clipBias = optionalParameter(options.clipBias, 0.0);
+	this.alpha = optionalParameter(options.alpha, 1.0);
+	this.time = optionalParameter(options.time, 0.0);
+	this.normalSampler = optionalParameter(options.waterNormals, null);
+	this.sunDirection = optionalParameter(options.sunDirection, new THREE.Vector3(0.70707, 0.70707, 0.0));
+	this.sunColor = new THREE.Color(optionalParameter(options.sunColor, 0xffffff));
+	this.waterColor = new THREE.Color(optionalParameter(options.waterColor, 0x7F7F7F));
+	this.eye = optionalParameter(options.eye, new THREE.Vector3(0, 0, 0));
+	this.distortionScale = optionalParameter(options.distortionScale, 20.0);
+	this.noiseScale = optionalParameter(options.noiseScale, 1.0);
+	this.betaVersion = optionalParameter(options.betaVersion, 0);
 	
 	this.renderer = renderer;
 	this.scene = scene;
 	this.mirrorPlane = new THREE.Plane();
-	this.normal = new THREE.Vector3( 0, 0, 1 );
+	this.normal = new THREE.Vector3(0, 0, 1);
 	this.mirrorWorldPosition = new THREE.Vector3();
 	this.cameraWorldPosition = new THREE.Vector3();
 	this.rotationMatrix = new THREE.Matrix4();
-	this.lookAtPosition = new THREE.Vector3( 0, 0, -1 );
+	this.lookAtPosition = new THREE.Vector3(0, 0, -1);
 	this.clipPlane = new THREE.Vector4();
 	
-	if ( camera instanceof THREE.PerspectiveCamera )
+	if (camera instanceof THREE.PerspectiveCamera)
 		this.camera = camera;
-	else 
-	{
+	else  {
 		this.camera = new THREE.PerspectiveCamera();
 		console.log(this.name + ': camera is not a Perspective Camera!')
 	}
@@ -181,18 +180,18 @@ THREE.Water = function ( renderer, camera, scene, options ) {
 
 	this.mirrorCamera = this.camera.clone();
 	
-	this.texture = new THREE.WebGLRenderTarget( width, height );
-	this.tempTexture = new THREE.WebGLRenderTarget( width, height );
+	this.texture = new THREE.WebGLRenderTarget(width, height);
+	this.tempTexture = new THREE.WebGLRenderTarget(width, height);
 	
-	var mirrorShader = THREE.ShaderLib[ "water" ];
-	var mirrorUniforms = THREE.UniformsUtils.clone( mirrorShader.uniforms );
+	var mirrorShader = THREE.ShaderLib["water"];
+	var mirrorUniforms = THREE.UniformsUtils.clone(mirrorShader.uniforms);
 
-	this.material = new THREE.ShaderMaterial( { 
+	this.material = new THREE.ShaderMaterial({ 
 		fragmentShader: mirrorShader.fragmentShader, 
 		vertexShader: mirrorShader.vertexShader, 
 		uniforms: mirrorUniforms,
 		transparent: true
-	} );
+	});
 
 	this.material.uniforms.mirrorSampler.value = this.texture;
 	this.material.uniforms.textureMatrix.value = this.textureMatrix;
@@ -208,7 +207,7 @@ THREE.Water = function ( renderer, camera, scene, options ) {
 	
 	this.material.uniforms.eye.value = this.eye;
 	
-	if ( !isPowerOfTwo(width) || !isPowerOfTwo(height) ) 
+	if (!isPowerOfTwo(width) || !isPowerOfTwo(height)) 
 	{
 		this.texture.generateMipmaps = false;
 		this.tempTexture.generateMipmaps = false;
@@ -218,7 +217,7 @@ THREE.Water = function ( renderer, camera, scene, options ) {
 	this.render();
 };
 
-THREE.Water.prototype = Object.create( THREE.Object3D.prototype );
+THREE.Water.prototype = Object.create(THREE.Object3D.prototype);
 
 THREE.Water.prototype.renderWithMirror = function (otherMirror) {
 
@@ -253,35 +252,35 @@ THREE.Water.prototype.updateTextureMatrix = function () {
 	this.updateMatrixWorld();
 	this.camera.updateMatrixWorld();
 
-	this.mirrorWorldPosition.setFromMatrixPosition( this.matrixWorld );
-	this.cameraWorldPosition.setFromMatrixPosition( this.camera.matrixWorld );
+	this.mirrorWorldPosition.setFromMatrixPosition(this.matrixWorld);
+	this.cameraWorldPosition.setFromMatrixPosition(this.camera.matrixWorld);
 
-	this.rotationMatrix.extractRotation( this.matrixWorld );
+	this.rotationMatrix.extractRotation(this.matrixWorld);
 
-	this.normal.set( 0, 0, 1 );
-	this.normal.applyMatrix4( this.rotationMatrix );
+	this.normal.set(0, 0, 1);
+	this.normal.applyMatrix4(this.rotationMatrix);
 
-	var view = this.mirrorWorldPosition.clone().sub( this.cameraWorldPosition );
-	view.reflect( this.normal ).negate();
-	view.add( this.mirrorWorldPosition );
+	var view = this.mirrorWorldPosition.clone().sub(this.cameraWorldPosition);
+	view.reflect(this.normal).negate();
+	view.add(this.mirrorWorldPosition);
 
-	this.rotationMatrix.extractRotation( this.camera.matrixWorld );
+	this.rotationMatrix.extractRotation(this.camera.matrixWorld);
 
 	this.lookAtPosition.set(0, 0, -1);
-	this.lookAtPosition.applyMatrix4( this.rotationMatrix );
-	this.lookAtPosition.add( this.cameraWorldPosition );
+	this.lookAtPosition.applyMatrix4(this.rotationMatrix);
+	this.lookAtPosition.add(this.cameraWorldPosition);
 
-	var target = this.mirrorWorldPosition.clone().sub( this.lookAtPosition );
-	target.reflect( this.normal ).negate();
-	target.add( this.mirrorWorldPosition );
+	var target = this.mirrorWorldPosition.clone().sub(this.lookAtPosition);
+	target.reflect(this.normal).negate();
+	target.add(this.mirrorWorldPosition);
 
 	this.up.set(0, -1, 0);
-	this.up.applyMatrix4( this.rotationMatrix );
-	this.up.reflect( this.normal ).negate();
+	this.up.applyMatrix4(this.rotationMatrix);
+	this.up.reflect(this.normal).negate();
 
-	this.mirrorCamera.position.copy( view );
+	this.mirrorCamera.position.copy(view);
 	this.mirrorCamera.up = this.up;
-	this.mirrorCamera.lookAt( target );
+	this.mirrorCamera.lookAt(target);
 	this.mirrorCamera.aspect = this.camera.aspect;
 
 	this.mirrorCamera.updateProjectionMatrix();
@@ -289,19 +288,19 @@ THREE.Water.prototype.updateTextureMatrix = function () {
 	this.mirrorCamera.matrixWorldInverse.getInverse(this.mirrorCamera.matrixWorld);
 
 	// Update the texture matrix
-	this.textureMatrix.set( 0.5, 0.0, 0.0, 0.5,
+	this.textureMatrix.set(0.5, 0.0, 0.0, 0.5,
 							0.0, 0.5, 0.0, 0.5,
 							0.0, 0.0, 0.5, 0.5,
-							0.0, 0.0, 0.0, 1.0 );
+							0.0, 0.0, 0.0, 1.0);
 	this.textureMatrix.multiply(this.mirrorCamera.projectionMatrix);
 	this.textureMatrix.multiply(this.mirrorCamera.matrixWorldInverse);
 
 	// Now update projection matrix with new clip plane, implementing code from: http://www.terathon.com/code/oblique.html
 	// Paper explaining this technique: http://www.terathon.com/lengyel/Lengyel-Oblique.pdf
-	this.mirrorPlane.setFromNormalAndCoplanarPoint( this.normal, this.mirrorWorldPosition );
+	this.mirrorPlane.setFromNormalAndCoplanarPoint(this.normal, this.mirrorWorldPosition);
 	this.mirrorPlane.applyMatrix4(this.mirrorCamera.matrixWorldInverse);
 
-	this.clipPlane.set(this.mirrorPlane.normal.x, this.mirrorPlane.normal.y, this.mirrorPlane.normal.z, this.mirrorPlane.constant );
+	this.clipPlane.set(this.mirrorPlane.normal.x, this.mirrorPlane.normal.y, this.mirrorPlane.normal.z, this.mirrorPlane.constant);
 
 	var q = new THREE.Vector4();
 	var projectionMatrix = this.mirrorCamera.projectionMatrix;
@@ -313,7 +312,7 @@ THREE.Water.prototype.updateTextureMatrix = function () {
 
 	// Calculate the scaled plane vector
 	var c = new THREE.Vector4();
-	c = this.clipPlane.multiplyScalar( 2.0 / this.clipPlane.dot(q) );
+	c = this.clipPlane.multiplyScalar(2.0 / this.clipPlane.dot(q));
 
 	// Replacing the third row of the projection matrix
 	projectionMatrix.elements[2] = c.x;
@@ -322,37 +321,37 @@ THREE.Water.prototype.updateTextureMatrix = function () {
 	projectionMatrix.elements[14] = c.w;
 	
 	var worldCoordinates = new THREE.Vector3();
-	worldCoordinates.setFromMatrixPosition( this.camera.matrixWorld );
+	worldCoordinates.setFromMatrixPosition(this.camera.matrixWorld);
 	this.eye = worldCoordinates;
 	this.material.uniforms.eye.value = this.eye;
 };
 
 THREE.Water.prototype.render = function () {
 
-	if( this.matrixNeedsUpdate )
+	if(this.matrixNeedsUpdate)
 		this.updateTextureMatrix();
 
 	this.matrixNeedsUpdate = true;
 
 	// Render the mirrored view of the current scene into the target texture
-	if( this.scene !== undefined && this.scene instanceof THREE.Scene )
+	if(this.scene !== undefined && this.scene instanceof THREE.Scene)
 	{
-        this.renderer.render( this.scene, this.mirrorCamera, this.texture, true );
+        this.renderer.render(this.scene, this.mirrorCamera, this.texture, true);
 	}
 
 };
 
 THREE.Water.prototype.renderTemp = function () {
 
-	if( this.matrixNeedsUpdate )
+	if(this.matrixNeedsUpdate)
 		this.updateTextureMatrix();
 
 	this.matrixNeedsUpdate = true;
 
 	// Render the mirrored view of the current scene into the target texture
-	if( this.scene !== undefined && this.scene instanceof THREE.Scene)
+	if(this.scene !== undefined && this.scene instanceof THREE.Scene)
 	{
-		this.renderer.render( this.scene, this.mirrorCamera, this.tempTexture, true );
+		this.renderer.render(this.scene, this.mirrorCamera, this.tempTexture, true);
 	}
 
 };

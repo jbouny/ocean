@@ -2,7 +2,7 @@ var WINDOW = {
 	ms_Width: 0,
 	ms_Height: 0,
 	ms_Callbacks: {
-		70: "WINDOW.ToggleFullScreen()"		// Toggle fullscreen
+		70: "WINDOW.toggleFullScreen()"		// Toggle fullscreen
 	},
 	
 	initialize: function initialize() {

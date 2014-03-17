@@ -25,6 +25,10 @@ var DEMO = {
 	
 	initialize: function initialize(inIdCanvas) {
 		this.ms_Canvas = $('#'+inIdCanvas);
+
+        this.ms_Canvas.click(function canvasClick() {
+            WINDOW.toggleFullScreen();
+        });
 		
 		// Initialize Renderer, Camera and Scene
 		this.ms_Renderer = this.enable? new THREE.WebGLRenderer() : new THREE.CanvasRenderer();
@@ -51,14 +55,14 @@ var DEMO = {
 		
 		// Create the water effect
 		this.ms_Water = new THREE.Water(this.ms_Renderer, this.ms_Camera, this.ms_Scene, {
-			textureWidth: 512, 
-			textureHeight: 512,
+			textureWidth: 256,
+			textureHeight: 256,
 			waterNormals: waterNormals,
 			alpha: 	1.0,
 			sunDirection: directionalLight.position.normalize(),
 			sunColor: 0xffffff,
 			waterColor: 0x001e0f,
-			betaVersion: 1
+			betaVersion: 0
 		});
 		var aMeshMirror = new THREE.Mesh(
 			new THREE.PlaneGeometry(1500, 1500, 20, 20), 
@@ -68,39 +72,22 @@ var DEMO = {
 		aMeshMirror.rotation.x = - Math.PI * 0.5;
 		
 		this.ms_Scene.add(aMeshMirror);
-	
+
 		this.loadSkyBox();
 	},
 	
 	loadSkyBox: function loadSkyBox() {
-		var cubeMap = new THREE.Texture([]);
-		cubeMap.format = THREE.RGBFormat;
-		cubeMap.flipY = false;
+        var path = "assets/img/";
+        var format = '.jpg';
+        var urls = [
+            path + 'skybox_0' + format, path + 'skybox_1' + format,
+            path + 'skybox_2' + format, path + 'skybox_3' + format,
+            path + 'skybox_4' + format, path + 'skybox_5' + format
+        ];
 
-		var loader = new THREE.ImageLoader();
-		loader.load('assets/img/skybox_s.jpg', function (image) {
-
-			var getSide = function (x, y) {
-				var size = 512;
-
-				var canvas = document.createElement('canvas');
-				canvas.width = size;
-				canvas.height = size;
-
-				var context = canvas.getContext('2d');
-				context.drawImage(image, - x * size, - y * size);
-
-				return canvas;
-			};
-
-			cubeMap.image[ 0 ] = getSide(2, 1); // px
-			cubeMap.image[ 1 ] = getSide(0, 1); // nx
-			cubeMap.image[ 2 ] = getSide(1, 0); // py
-			cubeMap.image[ 3 ] = getSide(1, 2); // ny
-			cubeMap.image[ 4 ] = getSide(1, 1); // pz
-			cubeMap.image[ 5 ] = getSide(3, 1); // nz
-			cubeMap.needsUpdate = true;
-		});
+        var cubeMap = THREE.ImageUtils.loadTextureCube(urls);
+        cubeMap.format = THREE.RGBFormat;
+        cubeMap.flipY = false;
 
 		var cubeShader = THREE.ShaderLib['cube'];
 		cubeShader.uniforms['tCube'].value = cubeMap;
