@@ -1,11 +1,10 @@
-function MainLoop()
-{
-	requestAnimationFrame( MainLoop );
-	DEMO.Update();
+function mainLoop() {
+	requestAnimationFrame(mainLoop);
+	DEMO.update();
 }
 
-$( function() {
-	WINDOW.Initialize();
+$(function() {
+	WINDOW.initialize();
 	
 	var parameters = {
 		alea: RAND_MT,
@@ -22,10 +21,10 @@ $( function() {
 		effect: [ DESTRUCTURE_EFFECT ]
 	};
 	
-	DEMO.Initialize( 'canvas-3d', parameters );
+	DEMO.initialize('canvas-3d', parameters);
 	
-	WINDOW.ResizeCallback = function( inWidth, inHeight ) { DEMO.Resize( inWidth, inHeight ); };
-	DEMO.Resize( WINDOW.ms_Width, WINDOW.ms_Height );
+	WINDOW.resizeCallback = function(inWidth, inHeight) { DEMO.resize(inWidth, inHeight); };
+	DEMO.resize(WINDOW.ms_Width, WINDOW.ms_Height);
 	
-	MainLoop();
-} );
+	mainLoop();
+});

@@ -10,6 +10,7 @@
 	</head>
 
 	<body>	
+		<div style="position:absolute; top:0px; left:0px; background-color: #000" id="debug"></div>
 		<div id="canvas-3d" class="viewer"></div>
 		
 		<!-- External libraries -->
@@ -17,13 +18,14 @@
 		
 		<script src="../demo/assets/libs/RequestAnimationFrame.js"></script>
 		<script src="../demo/assets/libs/jquery.min.js"></script>
-		<script src="../demo_mobile/assets/libs/orientationchange.js"></script>
+		<script src="../demo/assets/libs/three/OrbitControls.js"></script>
 		
 		<!-- Water shader -->
 		<script src="../water-material.js"></script>
 		
 		<!-- Demo files -->
 		<script src="../demo/assets/js/window.js"></script>
+        <script src="assets/js/DeviceOrientationControls.js"></script>
 		<script src="assets/js/demo.js"></script>
 		<script src="assets/js/main.js"></script>
 	</body>

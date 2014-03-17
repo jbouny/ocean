@@ -1,5 +1,4 @@
-var DEMO =
-{
+var DEMO = {
 	ms_Canvas: null,
 	ms_Renderer: null,
 	ms_Camera: null, 
@@ -7,62 +6,61 @@ var DEMO =
 	ms_Controls: null,
 	ms_Water: null,
 	ms_FilesDND: null,
+
+    enable: (function enable() {
+        try {
+            var aCanvas = document.createElement('canvas');
+            return !! window.WebGLRenderingContext && (aCanvas.getContext('webgl') || aCanvas.getContext('experimental-webgl'));
+        }
+        catch(e) {
+            return false;
+        }
+    })(),
 	
-	Enable: ( function() 
-	{
-        try 
-		{
-			var aCanvas = document.createElement( 'canvas' ); 
-			return !! window.WebGLRenderingContext && ( aCanvas.getContext( 'webgl' ) || aCanvas.getContext( 'experimental-webgl' ) ); 
-		} 
-		catch( e ) { return false; } 
-	} )(),
-	
-	Initialize: function( inIdCanvas, inParameters )
-	{
-		this.ms_Canvas = $( '#'+inIdCanvas );
+	initialize: function initialize(inIdCanvas, inParameters) {
+		this.ms_Canvas = $('#'+inIdCanvas);
 		
 		// Initialize Renderer, Camera and Scene
-		this.ms_Renderer = this.Enable? new THREE.WebGLRenderer() : new THREE.CanvasRenderer();
-		this.ms_Canvas.html( this.ms_Renderer.domElement );
+		this.ms_Renderer = this.enable? new THREE.WebGLRenderer() : new THREE.CanvasRenderer();
+		this.ms_Canvas.html(this.ms_Renderer.domElement);
 		this.ms_Scene = new THREE.Scene();
 		
-		this.ms_Camera = new THREE.PerspectiveCamera( 55.0, WINDOW.ms_Width / WINDOW.ms_Height, 0.5, 3000000 );
-		this.ms_Camera.position.set( 0, Math.max( inParameters.width * 1.5, inParameters.height ) / 8, -inParameters.height );
-		this.ms_Camera.lookAt( new THREE.Vector3( 0, 0, 0 ) );
+		this.ms_Camera = new THREE.PerspectiveCamera(55.0, WINDOW.ms_Width / WINDOW.ms_Height, 0.5, 3000000);
+		this.ms_Camera.position.set(0, Math.max(inParameters.width * 1.5, inParameters.height) / 8, -inParameters.height);
+		this.ms_Camera.lookAt(new THREE.Vector3(0, 0, 0));
 		
 		// Initialize Orbit control		
-		this.ms_Controls = new THREE.OrbitControls( this.ms_Camera, this.ms_Renderer.domElement );
+		this.ms_Controls = new THREE.OrbitControls(this.ms_Camera, this.ms_Renderer.domElement);
 		this.ms_Controls.userPan = false;
 		this.ms_Controls.userPanSpeed = 0.0;
 		this.ms_Controls.maxDistance = 5000.0;
 		this.ms_Controls.maxPolarAngle = Math.PI * 0.495;
 	
 		// Add light
-		var directionalLight = new THREE.DirectionalLight( 0xffff55, 1 );
-		directionalLight.position.set( -600, 300, 600 );
-		this.ms_Scene.add( directionalLight );
+		var directionalLight = new THREE.DirectionalLight(0xffff55, 1);
+		directionalLight.position.set(-600, 300, 600);
+		this.ms_Scene.add(directionalLight);
 		
 		// Create terrain
-		this.LoadTerrain( inParameters );
+		this.loadTerrain(inParameters);
 		
 		// Load textures		
-		var waterNormals = new THREE.ImageUtils.loadTexture( '../assets/img/waternormals.jpg' );
+		var waterNormals = new THREE.ImageUtils.loadTexture('../assets/img/waternormals.jpg');
 		waterNormals.wrapS = waterNormals.wrapT = THREE.RepeatWrapping; 
 		
 		// Load filesdnd texture
-		new Konami( function() {
-			if( DEMO.ms_FilesDND == null )
+		new Konami(function() {
+			if(DEMO.ms_FilesDND == null)
 			{
-				var aTextureFDND = THREE.ImageUtils.loadTexture( "assets/img/filesdnd.png" );
-				DEMO.ms_FilesDND = new THREE.Mesh( new THREE.PlaneGeometry( 1000, 1000 ), new THREE.MeshBasicMaterial( { map : aTextureFDND, transparent: true, side : THREE.DoubleSide } ) );
+				var aTextureFDND = THREE.ImageUtils.loadTexture("assets/img/filesdnd.png");
+				DEMO.ms_FilesDND = new THREE.Mesh(new THREE.PlaneGeometry(1000, 1000), new THREE.MeshBasicMaterial({ map : aTextureFDND, transparent: true, side : THREE.DoubleSide }));
 				DEMO.ms_FilesDND.position.y = 1000;
-				DEMO.ms_Scene.add( DEMO.ms_FilesDND );
+				DEMO.ms_Scene.add(DEMO.ms_FilesDND);
 			}
-		} );
+		});
 		
 		// Create the water effect
-		this.ms_Water = new THREE.Water( this.ms_Renderer, this.ms_Camera, this.ms_Scene, {
+		this.ms_Water = new THREE.Water(this.ms_Renderer, this.ms_Camera, this.ms_Scene, {
 			textureWidth: 512, 
 			textureHeight: 512,
 			waterNormals: waterNormals,
@@ -71,34 +69,33 @@ var DEMO =
 			sunColor: 0xffffff,
 			waterColor: 0x001e0f,
 			distortionScale: 50.0,
-		} );
+		});
 		var aMeshMirror = new THREE.Mesh(
-			new THREE.PlaneGeometry( inParameters.width * 500, inParameters.height * 500, 5, 5 ), 
+			new THREE.PlaneGeometry(inParameters.width * 500, inParameters.height * 500, 5, 5), 
 			this.ms_Water.material
 		);
-		aMeshMirror.add( this.ms_Water );
+		aMeshMirror.add(this.ms_Water);
 		aMeshMirror.rotation.x = - Math.PI * 0.5;
-		this.ms_Scene.add( aMeshMirror );
+		this.ms_Scene.add(aMeshMirror);
 	
-		this.LoadSkyBox();
+		this.loadSkyBox();
 	},
 	
-	LoadSkyBox: function()
-	{
-		var aCubeMap = THREE.ImageUtils.loadTextureCube( [
+	loadSkyBox: function loadSkyBox() {
+		var aCubeMap = THREE.ImageUtils.loadTextureCube([
 		  'assets/img/px.jpg',
 		  'assets/img/nx.jpg',
 		  'assets/img/py.jpg',
 		  'assets/img/ny.jpg',
 		  'assets/img/pz.jpg',
 		  'assets/img/nz.jpg'
-		] );
+		]);
 		aCubeMap.format = THREE.RGBFormat;
 
 		var aShader = THREE.ShaderLib['cube'];
 		aShader.uniforms['tCube'].value = aCubeMap;
 
-		var aSkyBoxMaterial = new THREE.ShaderMaterial( {
+		var aSkyBoxMaterial = new THREE.ShaderMaterial({
 		  fragmentShader: aShader.fragmentShader,
 		  vertexShader: aShader.vertexShader,
 		  uniforms: aShader.uniforms,
@@ -107,42 +104,38 @@ var DEMO =
 		});
 
 		var aSkybox = new THREE.Mesh(
-		  new THREE.CubeGeometry( 1000000, 1000000, 1000000 ),
+		  new THREE.CubeGeometry(1000000, 1000000, 1000000),
 		  aSkyBoxMaterial
 		);
 		
-		this.ms_Scene.add( aSkybox );
+		this.ms_Scene.add(aSkybox);
 	},
 	
-	LoadTerrain: function( inParameters )
-	{
-		var terrainGeo = TERRAINGEN.Get( inParameters );
-		var terrainMaterial = new THREE.MeshPhongMaterial( { vertexColors: THREE.VertexColors, shading: THREE.FlatShading, side: THREE.DoubleSide } );
+	loadTerrain: function loadTerrain(inParameters) {
+		var terrainGeo = TERRAINGEN.Get(inParameters);
+		var terrainMaterial = new THREE.MeshPhongMaterial({ vertexColors: THREE.VertexColors, shading: THREE.FlatShading, side: THREE.DoubleSide });
 		
-		var terrain = new THREE.Mesh( terrainGeo, terrainMaterial );
+		var terrain = new THREE.Mesh(terrainGeo, terrainMaterial);
 		terrain.position.y = - inParameters.depth * 0.4;
-		this.ms_Scene.add( terrain );
+		this.ms_Scene.add(terrain);
 	},
 	
-	Display: function()
-	{
+	display: function display() {
 		this.ms_Water.render();
-		this.ms_Renderer.render( this.ms_Scene, this.ms_Camera );
+		this.ms_Renderer.render(this.ms_Scene, this.ms_Camera);
 	},
 	
-	Update: function()
-	{
+	update: function update() {
 		this.ms_Water.material.uniforms.time.value += 1.0 / 60.0;
 		this.ms_Controls.update();
-		this.Display();
+		this.display();
 	},
 	
-	Resize: function( inWidth, inHeight )
-	{
+	resize: function resize(inWidth, inHeight) {
 		this.ms_Camera.aspect =  inWidth / inHeight;
 		this.ms_Camera.updateProjectionMatrix();
-		this.ms_Renderer.setSize( inWidth, inHeight );
-		this.ms_Canvas.html( this.ms_Renderer.domElement );
-		this.Display();
+		this.ms_Renderer.setSize(inWidth, inHeight);
+		this.ms_Canvas.html(this.ms_Renderer.domElement);
+		this.display();
 	}
 };

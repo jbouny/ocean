@@ -1,16 +1,15 @@
-function MainLoop()
-{
-	requestAnimationFrame( MainLoop );
-	DEMO.Update();
+function mainLoop() {
+    requestAnimationFrame(mainLoop);
+    DEMO.update();
 }
 
-$( function() {
-	WINDOW.Initialize();
+$(function() {
+	WINDOW.initialize();
 	
-	DEMO.Initialize( 'canvas-3d' );
+	DEMO.initialize('canvas-3d');
 	
-	WINDOW.ResizeCallback = function( inWidth, inHeight ) { DEMO.Resize( inWidth, inHeight ); };
-	DEMO.Resize( WINDOW.ms_Width, WINDOW.ms_Height );
-	
-	MainLoop();
-} );
+	WINDOW.resizeCallback = function(inWidth, inHeight) { DEMO.resize(inWidth, inHeight); };
+	DEMO.resize(WINDOW.ms_Width, WINDOW.ms_Height);
+
+    mainLoop();
+});

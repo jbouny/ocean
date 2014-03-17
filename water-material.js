@@ -33,6 +33,8 @@ THREE.ShaderLib['water'] = {
 		'varying vec4 mirrorCoord;',
 		'varying vec3 worldPosition;',
 		
+		'precision mediump float;',
+		
 		'float getHeight( in vec2 uv )',
 		'{',
 		'	vec2 uv0 = uv / ( 103.0 * noiseScale ) + vec2(time / 17.0, time / 29.0);',
