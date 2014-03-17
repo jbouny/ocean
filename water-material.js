@@ -101,7 +101,7 @@ THREE.ShaderLib['water'] = {
 		
 		'void main()',
 		'{',
-		'	vec3 surfaceNormal = getNoise(worldPosition.xz);',
+		'	vec3 surfaceNormal = (getNoise(worldPosition.xz));',
 
 		'	vec3 diffuseLight = vec3(0.0);',
 		'	vec3 specularLight = vec3(0.0);',
@@ -112,8 +112,8 @@ THREE.ShaderLib['water'] = {
 		
 		'	float distance = length(worldToEye);',
 
-		'	vec2 distortion = surfaceNormal.xz * (0.001 + 1.0 / distance) * distortionScale;',
-        '   vec4 mirrorDistord = mirrorCoord + vec4(surfaceNormal, 0.0);',
+		'	vec2 distortion = surfaceNormal.xz * distortionScale * sqrt(distance) * 0.07;',
+        '   vec3 mirrorDistord = mirrorCoord.xyz + vec3(distortion.x, distortion.y, 1.0);',
         '   vec3 reflectionSample = texture2DProj(mirrorSampler, mirrorDistord).xyz;',
 
 		'	float theta = max(dot(eyeDirection, surfaceNormal), 0.0);',
