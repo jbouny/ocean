@@ -56,14 +56,14 @@ var DEMO = {
 		new Konami(function() {
 			if(DEMO.ms_FilesDND == null)
 			{
-				var aTextureFDND = THREE.ImageUtils.loadTexture("assets/img/filesdnd.png");
+				var aTextureFDND = THREE.ImageUtils.loadTexture("assets/img/filesdnd_ad.png");
 				DEMO.ms_FilesDND = new THREE.Mesh(new THREE.PlaneGeometry(1000, 1000), new THREE.MeshBasicMaterial({ map : aTextureFDND, transparent: true, side : THREE.DoubleSide }));
 
 				// Mesh callback
 				DEMO.ms_FilesDND.callback = function() { window.open("http://www.filesdnd.com"); }
 				DEMO.ms_Clickable.push(DEMO.ms_FilesDND);
 				
-				DEMO.ms_FilesDND.position.y = 1000;
+				DEMO.ms_FilesDND.position.y = 1200;
 				DEMO.ms_Scene.add(DEMO.ms_FilesDND);
 			}
 		});
