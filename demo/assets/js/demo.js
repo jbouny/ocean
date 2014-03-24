@@ -6,6 +6,8 @@ var DEMO = {
 	ms_Controls: null,
 	ms_Water: null,
 	ms_FilesDND: null,
+	ms_Projector: null,
+	ms_Clickable: [],
 
     enable: (function enable() {
         try {
@@ -20,7 +22,7 @@ var DEMO = {
 	initialize: function initialize(inIdCanvas, inParameters) {
 		this.ms_Canvas = $('#'+inIdCanvas);
 		
-		// Initialize Renderer, Camera and Scene
+		// Initialize Renderer, Camera, Projector and Scene
 		this.ms_Renderer = this.enable? new THREE.WebGLRenderer() : new THREE.CanvasRenderer();
 		this.ms_Canvas.html(this.ms_Renderer.domElement);
 		this.ms_Scene = new THREE.Scene();
@@ -28,6 +30,8 @@ var DEMO = {
 		this.ms_Camera = new THREE.PerspectiveCamera(55.0, WINDOW.ms_Width / WINDOW.ms_Height, 0.5, 3000000);
 		this.ms_Camera.position.set(0, Math.max(inParameters.width * 1.5, inParameters.height) / 8, -inParameters.height);
 		this.ms_Camera.lookAt(new THREE.Vector3(0, 0, 0));
+
+		this.ms_Projector = new THREE.Projector();
 		
 		// Initialize Orbit control		
 		this.ms_Controls = new THREE.OrbitControls(this.ms_Camera, this.ms_Renderer.domElement);
@@ -54,6 +58,11 @@ var DEMO = {
 			{
 				var aTextureFDND = THREE.ImageUtils.loadTexture("assets/img/filesdnd.png");
 				DEMO.ms_FilesDND = new THREE.Mesh(new THREE.PlaneGeometry(1000, 1000), new THREE.MeshBasicMaterial({ map : aTextureFDND, transparent: true, side : THREE.DoubleSide }));
+
+				// Mesh callback
+				DEMO.ms_FilesDND.callback = function() { window.open("http://www.filesdnd.com"); }
+				DEMO.ms_Clickable.push(DEMO.ms_FilesDND);
+				
 				DEMO.ms_FilesDND.position.y = 1000;
 				DEMO.ms_Scene.add(DEMO.ms_FilesDND);
 			}
