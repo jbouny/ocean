@@ -135,6 +135,9 @@ var DEMO = {
 	},
 	
 	update: function update() {
+		if (this.ms_FilesDND != null) {
+			this.ms_FilesDND.rotation.y += 0.01;
+		}
 		this.ms_Water.material.uniforms.time.value += 1.0 / 60.0;
 		this.ms_Controls.update();
 		this.display();
