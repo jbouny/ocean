@@ -49,7 +49,8 @@ var DEMO = {
 			sunDirection: directionalLight.position.normalize(),
 			sunColor: 0xffffff,
 			waterColor: 0x001e0f,
-			betaVersion: 0
+			betaVersion: 0,
+			side: THREE.DoubleSide
 		});
 		var aMeshMirror = new THREE.Mesh(
 			new THREE.PlaneGeometry(2000, 2000, 100, 100), 

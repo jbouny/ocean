@@ -102,6 +102,8 @@ THREE.ShaderLib['water'] = {
 		'void main()',
 		'{',
 		'	vec3 surfaceNormal = (getNoise(worldPosition.xz));',
+		'   if( eye.y < worldPosition.y )',
+		'		surfaceNormal = surfaceNormal * -1.0;',
 
 		'	vec3 diffuseLight = vec3(0.0);',
 		'	vec3 specularLight = vec3(0.0);',
@@ -147,7 +149,7 @@ THREE.Water = function (renderer, camera, scene, options) {
 	
 	var width = optionalParameter(options.textureWidth, 512);
 	var height = optionalParameter(options.textureHeight, 512);
-	this.clipBias = optionalParameter(options.clipBias, 0.0);
+	this.clipBias = optionalParameter(options.clipBias, -0.0001);
 	this.alpha = optionalParameter(options.alpha, 1.0);
 	this.time = optionalParameter(options.time, 0.0);
 	this.normalSampler = optionalParameter(options.waterNormals, null);
@@ -158,6 +160,7 @@ THREE.Water = function (renderer, camera, scene, options) {
 	this.distortionScale = optionalParameter(options.distortionScale, 20.0);
 	this.noiseScale = optionalParameter(options.noiseScale, 1.0);
 	this.betaVersion = optionalParameter(options.betaVersion, 0);
+	this.side = optionalParameter(options.side, THREE.FrontSide);
 	
 	this.renderer = renderer;
 	this.scene = scene;
@@ -190,7 +193,8 @@ THREE.Water = function (renderer, camera, scene, options) {
 		fragmentShader: mirrorShader.fragmentShader, 
 		vertexShader: mirrorShader.vertexShader, 
 		uniforms: mirrorUniforms,
-		transparent: true
+		transparent: true,
+		side: this.side
 	});
 
 	this.material.uniforms.mirrorSampler.value = this.texture;
@@ -257,7 +261,12 @@ THREE.Water.prototype.updateTextureMatrix = function () {
 
 	this.rotationMatrix.extractRotation(this.matrixWorld);
 
-	this.normal.set(0, 0, 1);
+	if( this.mirrorWorldPosition.y > this.cameraWorldPosition.y ) {
+		this.normal.set(0, 0, -1);
+	}
+	else {
+		this.normal.set(0, 0, 1);
+	}
 	this.normal.applyMatrix4(this.rotationMatrix);
 
 	var view = this.mirrorWorldPosition.clone().sub(this.cameraWorldPosition);
