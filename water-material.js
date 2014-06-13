@@ -9,19 +9,24 @@
 
 THREE.ShaderLib['water'] = {
 
-	uniforms: { "normalSampler":	{ type: "t", value: null },
-				"mirrorSampler":	{ type: "t", value: null },
-				"alpha":			{ type: "f", value: 1.0 },
-				"time":				{ type: "f", value: 0.0 },
-				"distortionScale":	{ type: "f", value: 20.0 },
-				"noiseScale":		{ type: "f", value: 1.0 },
-				"textureMatrix" :	{ type: "m4", value: new THREE.Matrix4() },
-				"sunColor":			{ type: "c", value: new THREE.Color(0x7F7F7F) },
-				"sunDirection":		{ type: "v3", value: new THREE.Vector3(0.70707, 0.70707, 0) },
-				"eye":				{ type: "v3", value: new THREE.Vector3(0, 0, 0) },
-				"waterColor":		{ type: "c", value: new THREE.Color(0x555555) },
-				"betaVersion":		{ type: "i", value: 0 }
-	},
+	uniforms: THREE.UniformsUtils.merge( [
+		THREE.UniformsLib[ "fog" ],
+		
+		{ 
+			"normalSampler":	{ type: "t", value: null },
+			"mirrorSampler":	{ type: "t", value: null },
+			"alpha":			{ type: "f", value: 1.0 },
+			"time":				{ type: "f", value: 0.0 },
+			"distortionScale":	{ type: "f", value: 20.0 },
+			"noiseScale":		{ type: "f", value: 1.0 },
+			"textureMatrix" :	{ type: "m4", value: new THREE.Matrix4() },
+			"sunColor":			{ type: "c", value: new THREE.Color(0x7F7F7F) },
+			"sunDirection":		{ type: "v3", value: new THREE.Vector3(0.70707, 0.70707, 0) },
+			"eye":				{ type: "v3", value: new THREE.Vector3(0, 0, 0) },
+			"waterColor":		{ type: "c", value: new THREE.Color(0x555555) },
+			"betaVersion":		{ type: "i", value: 0 }
+		}
+	] ),
 
 	vertexShader: [
 		'uniform mat4 textureMatrix;',
@@ -99,6 +104,8 @@ THREE.ShaderLib['water'] = {
 		'	return noise.xzy * 0.5 - 1.0;',
 		'}',
 		
+		THREE.ShaderChunk[ "fog_pars_fragment" ],
+		
 		'void main()',
 		'{',
 		'	vec3 surfaceNormal = (getNoise(worldPosition.xz));',
@@ -126,6 +133,8 @@ THREE.ShaderLib['water'] = {
         '   vec2 tmp = mirrorCoord.xy / mirrorCoord.z + distortion;',
 
         '	gl_FragColor = vec4(albedo, alpha);',
+		
+			THREE.ShaderChunk[ "fog_fragment" ],
 		'}'
 	].join('\n')
 
@@ -161,6 +170,7 @@ THREE.Water = function (renderer, camera, scene, options) {
 	this.noiseScale = optionalParameter(options.noiseScale, 1.0);
 	this.betaVersion = optionalParameter(options.betaVersion, 0);
 	this.side = optionalParameter(options.side, THREE.FrontSide);
+	this.fog = optionalParameter(options.fog, false);
 	
 	this.renderer = renderer;
 	this.scene = scene;
@@ -194,7 +204,8 @@ THREE.Water = function (renderer, camera, scene, options) {
 		vertexShader: mirrorShader.vertexShader, 
 		uniforms: mirrorUniforms,
 		transparent: true,
-		side: this.side
+		side: this.side,
+		fog: this.fog
 	});
 
 	this.material.uniforms.mirrorSampler.value = this.texture;

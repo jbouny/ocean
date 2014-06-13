@@ -77,7 +77,7 @@ var DEMO = {
 			sunDirection: directionalLight.position.normalize(),
 			sunColor: 0xffffff,
 			waterColor: 0x001e0f,
-			distortionScale: 50.0,
+			distortionScale: 50.0
 		});
 		var aMeshMirror = new THREE.Mesh(
 			new THREE.PlaneGeometry(inParameters.width * 500, inParameters.height * 500, 5, 5), 
@@ -113,7 +113,7 @@ var DEMO = {
 		});
 
 		var aSkybox = new THREE.Mesh(
-		  new THREE.CubeGeometry(1000000, 1000000, 1000000),
+		  new THREE.BoxGeometry(1000000, 1000000, 1000000),
 		  aSkyBoxMaterial
 		);
 		
