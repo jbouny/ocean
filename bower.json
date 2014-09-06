@@ -1,0 +1,23 @@
+{
+  "name": "ocean",
+  "version": "1.0.0",
+  "homepage": "http://jeremybouny.fr/ocean/demo",
+  "authors": [
+    "jbouny@gmail.com"
+  ],
+  "description": "Realistic water shader for Three.js",
+  "main": "water-material.js",
+  "keywords": [
+    "three.js",
+    "shader",
+    "water"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "demo",
+    "demo_*",
+    "screenshots",
+    "assets/libs"
+  ]
+}
