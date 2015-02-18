@@ -37,6 +37,10 @@ THREE.ShaderLib['water'] = {
 
 		'varying vec4 mirrorCoord;',
 		'varying vec3 worldPosition;',
+		'varying vec3 modelPosition;',
+		'varying vec3 surfaceX;',
+		'varying vec3 surfaceY;',
+		'varying vec3 surfaceZ;',
 		
 		'float getHeight(in vec2 uv)',
 		'{',
@@ -57,6 +61,10 @@ THREE.ShaderLib['water'] = {
 		'{',
 		'	mirrorCoord = modelMatrix * vec4(position, 1.0);',
 		'	worldPosition = mirrorCoord.xyz;',
+		'	modelPosition = position;',
+		'	surfaceX = vec3( modelMatrix[0][0], modelMatrix[0][1], modelMatrix[0][2]);',
+		'	surfaceY = vec3( modelMatrix[1][0], modelMatrix[1][1], modelMatrix[1][2]);',
+		'	surfaceZ = vec3( modelMatrix[2][0], modelMatrix[2][1], modelMatrix[2][2]);',
 		
 		'	mirrorCoord = textureMatrix * mirrorCoord;',
 		'	gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);',
@@ -82,6 +90,10 @@ THREE.ShaderLib['water'] = {
 
 		'varying vec4 mirrorCoord;',
 		'varying vec3 worldPosition;',
+		'varying vec3 modelPosition;',
+		'varying vec3 surfaceX;',
+		'varying vec3 surfaceY;',
+		'varying vec3 surfaceZ;',
 		
 		'void sunLight(const vec3 surfaceNormal, const vec3 eyeDirection, in float shiny, in float spec, in float diffuse, inout vec3 diffuseColor, inout vec3 specularColor)',
 		'{',
@@ -101,40 +113,46 @@ THREE.ShaderLib['water'] = {
         '		(texture2D(normalSampler, uv1)) +',
         '		(texture2D(normalSampler, uv2)) +',
 		'		(texture2D(normalSampler, uv3));',
-		'	return noise.xzy * 0.5 - 1.0;',
+		'	return noise.xyz * 0.5 - 1.0;',
 		'}',
 		
 		THREE.ShaderChunk[ "fog_pars_fragment" ],
 		
 		'void main()',
 		'{',
-		'	vec3 surfaceNormal = (getNoise(worldPosition.xz));',
-		'   if( eye.y < worldPosition.y )',
-		'		surfaceNormal = surfaceNormal * -1.0;',
-
-		'	vec3 diffuseLight = vec3(0.0);',
-		'	vec3 specularLight = vec3(0.0);',
-
 		'	vec3 worldToEye = eye - worldPosition;',
 		'	vec3 eyeDirection = normalize(worldToEye);',
-		'	sunLight(surfaceNormal, eyeDirection, 100.0, 2.0, 0.5, diffuseLight, specularLight);',
 		
-		'	float distance = length(worldToEye);',
+		// Get noise based on the 3d position
+		'	vec3 noise = (getNoise(modelPosition.xy * 1.0));',
+		'	vec3 distordNormal = noise.x * surfaceX + noise.y * surfaceY + noise.z * surfaceZ;',
+		
+		// Revert normal if the eye is bellow the mesh
+		'	if(dot(eyeDirection, surfaceZ) < 0.0)',
+		'		distordNormal = distordNormal * -1.0;',
 
-		'	vec2 distortion = surfaceNormal.xz * distortionScale * sqrt(distance) * 0.07;',
+		// Compute diffuse and specular light (use normal and eye direction)
+		'	vec3 diffuseLight = vec3(0.0);',
+		'	vec3 specularLight = vec3(0.0);',
+		'	sunLight(distordNormal, eyeDirection, 100.0, 2.0, 0.5, diffuseLight, specularLight);',
+		
+		// Compute final 3d distortion, and project it to get the mirror sampling
+		'	float distance = length(worldToEye);',
+		'	vec2 distortion = distordNormal.xz * distortionScale * sqrt(distance) * 0.07;',
         '   vec3 mirrorDistord = mirrorCoord.xyz + vec3(distortion.x, distortion.y, 1.0);',
         '   vec3 reflectionSample = texture2DProj(mirrorSampler, mirrorDistord).xyz;',
 
-		'	float theta = max(dot(eyeDirection, surfaceNormal), 0.0);',
+		// Compute other parameters as the reflectance and the water appareance
+		'	float theta = max(dot(eyeDirection, distordNormal), 0.0);',
 		'	const float rf0 = 0.3;',
 		'	float reflectance = 0.3 + (1.0 - 0.3) * pow((1.0 - theta), 5.0);',
-		'	vec3 scatter = max(0.0, dot(surfaceNormal, eyeDirection)) * waterColor;',
-		'	vec3 albedo = mix(sunColor * diffuseLight * 0.3 + scatter, (vec3(0.1) + reflectionSample * 0.9 + reflectionSample * specularLight), reflectance);',
-        '   vec2 tmp = mirrorCoord.xy / mirrorCoord.z + distortion;',
-
-        '	gl_FragColor = vec4(albedo, alpha);',
+		'	vec3 scatter = max(0.0, dot(distordNormal, eyeDirection)) * waterColor;',
 		
-			THREE.ShaderChunk[ "fog_fragment" ],
+		// Compute final pixel color
+		'	vec3 albedo = mix(sunColor * diffuseLight * 0.3 + scatter, (vec3(0.1) + reflectionSample * 0.9 + reflectionSample * specularLight), reflectance);',
+        '	gl_FragColor = vec4(albedo, alpha);',	
+		
+		THREE.ShaderChunk[ "fog_fragment" ],
 		'}'
 	].join('\n')
 
@@ -176,7 +194,6 @@ THREE.Water = function (renderer, camera, scene, options) {
 	this.scene = scene;
 	this.mirrorPlane = new THREE.Plane();
 	this.normal = new THREE.Vector3(0, 0, 1);
-	this.mirrorWorldPosition = new THREE.Vector3();
 	this.cameraWorldPosition = new THREE.Vector3();
 	this.rotationMatrix = new THREE.Matrix4();
 	this.lookAtPosition = new THREE.Vector3(0, 0, -1);
@@ -207,6 +224,8 @@ THREE.Water = function (renderer, camera, scene, options) {
 		side: this.side,
 		fog: this.fog
 	});
+	
+	this.mesh = new THREE.Object3D();
 
 	this.material.uniforms.mirrorSampler.value = this.texture;
 	this.material.uniforms.textureMatrix.value = this.textureMatrix;
@@ -233,6 +252,10 @@ THREE.Water = function (renderer, camera, scene, options) {
 };
 
 THREE.Water.prototype = Object.create(THREE.Object3D.prototype);
+
+THREE.Water.prototype.setMesh = function (mesh) {
+	this.mesh = mesh;
+}
 
 THREE.Water.prototype.renderWithMirror = function (otherMirror) {
 
@@ -267,22 +290,22 @@ THREE.Water.prototype.updateTextureMatrix = function () {
 	this.updateMatrixWorld();
 	this.camera.updateMatrixWorld();
 
-	this.mirrorWorldPosition.setFromMatrixPosition(this.matrixWorld);
 	this.cameraWorldPosition.setFromMatrixPosition(this.camera.matrixWorld);
 
 	this.rotationMatrix.extractRotation(this.matrixWorld);
 
-	if( this.mirrorWorldPosition.y > this.cameraWorldPosition.y ) {
-		this.normal.set(0, 0, -1);
+	this.normal = (new THREE.Vector3(0, 0, 1)).applyEuler(this.mesh.rotation);
+	{
+		var cameraLookAt = (new THREE.Vector3(0, 0, 1)).applyEuler(this.camera.rotation);
+		if(this.normal.dot(cameraLookAt) < 0) {
+			var meshNormal = (new THREE.Vector3(0, 0, 1)).applyEuler(this.mesh.rotation);
+			this.normal.reflect(meshNormal);
+		}
 	}
-	else {
-		this.normal.set(0, 0, 1);
-	}
-	this.normal.applyMatrix4(this.rotationMatrix);
 
-	var view = this.mirrorWorldPosition.clone().sub(this.cameraWorldPosition);
+	var view = this.mesh.position.clone().sub(this.cameraWorldPosition);
 	view.reflect(this.normal).negate();
-	view.add(this.mirrorWorldPosition);
+	view.add(this.mesh.position);
 
 	this.rotationMatrix.extractRotation(this.camera.matrixWorld);
 
@@ -290,9 +313,9 @@ THREE.Water.prototype.updateTextureMatrix = function () {
 	this.lookAtPosition.applyMatrix4(this.rotationMatrix);
 	this.lookAtPosition.add(this.cameraWorldPosition);
 
-	var target = this.mirrorWorldPosition.clone().sub(this.lookAtPosition);
+	var target = this.mesh.position.clone().sub(this.lookAtPosition);
 	target.reflect(this.normal).negate();
-	target.add(this.mirrorWorldPosition);
+	target.add(this.mesh.position);
 
 	this.up.set(0, -1, 0);
 	this.up.applyMatrix4(this.rotationMatrix);
@@ -317,7 +340,7 @@ THREE.Water.prototype.updateTextureMatrix = function () {
 
 	// Now update projection matrix with new clip plane, implementing code from: http://www.terathon.com/code/oblique.html
 	// Paper explaining this technique: http://www.terathon.com/lengyel/Lengyel-Oblique.pdf
-	this.mirrorPlane.setFromNormalAndCoplanarPoint(this.normal, this.mirrorWorldPosition);
+	this.mirrorPlane.setFromNormalAndCoplanarPoint(this.normal, this.mesh.position);
 	this.mirrorPlane.applyMatrix4(this.mirrorCamera.matrixWorldInverse);
 
 	this.clipPlane.set(this.mirrorPlane.normal.x, this.mirrorPlane.normal.y, this.mirrorPlane.normal.z, this.mirrorPlane.constant);
@@ -354,8 +377,7 @@ THREE.Water.prototype.render = function (isTempTexture) {
 	this.matrixNeedsUpdate = true;
 
 	// Render the mirrored view of the current scene into the target texture
-	if(this.scene !== undefined && this.scene instanceof THREE.Scene)
-	{
+	if(this.scene !== undefined && this.scene instanceof THREE.Scene) {
 		var renderTexture = (isTempTexture !== undefined && isTempTexture)? this.tempTexture : this.texture;
         this.renderer.render(this.scene, this.mirrorCamera, renderTexture, true);
 	}
