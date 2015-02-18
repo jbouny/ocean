@@ -36,6 +36,9 @@ var DEMO = {
 		directionalLight.position.set(-600, 300, 600);
 		this.ms_Scene.add(directionalLight);
 		
+		// Add fog
+		this.ms_Scene.fog = new THREE.FogExp2( 0xffffff, 0.0005 );
+		
 		// Load textures		
 		var waterNormals = new THREE.ImageUtils.loadTexture('../assets/img/waternormals.jpg');
 		waterNormals.wrapS = waterNormals.wrapT = THREE.RepeatWrapping; 
@@ -50,10 +53,11 @@ var DEMO = {
 			sunColor: 0xffffff,
 			waterColor: 0x001e0f,
 			betaVersion: 0,
+			fog: true,
 			side: THREE.DoubleSide
 		});
 		this.ms_MeshMirror = new THREE.Mesh(
-			new THREE.PlaneBufferGeometry(2000, 2000, 1, 1), 
+			new THREE.PlaneBufferGeometry(100000, 100000, 1, 1), 
 			this.ms_Water.material
 		);
 		this.ms_Water.setMesh(this.ms_MeshMirror);

@@ -116,6 +116,7 @@ THREE.ShaderLib['water'] = {
 		'	return noise.xyz * 0.5 - 1.0;',
 		'}',
 		
+		THREE.ShaderChunk[ "common" ],
 		THREE.ShaderChunk[ "fog_pars_fragment" ],
 		
 		'void main()',
