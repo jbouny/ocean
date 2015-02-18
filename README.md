@@ -14,7 +14,7 @@ http://jeremybouny.fr/ocean/demo_mobile/ <- only for smartphone and tablet, you 
 
 ### Dependencies
 
-- Three.js r65 to render the scene : https://github.com/mrdoob/three.js/
+- Three.js r70 to render the scene : https://github.com/mrdoob/three.js/
 - JQuery 1.10.2 as a helper : https://github.com/jquery/jquery
 - Terrain-generator for procedural terrain generation : https://github.com/jbouny/terrain-generator
 
