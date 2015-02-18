@@ -68,7 +68,6 @@ var DEMO = {
 			new THREE.PlaneBufferGeometry(1500, 1500, 1, 1), 
 			this.ms_Water.material
 		);
-		this.ms_Water.setMesh(aMeshMirror);
 		aMeshMirror.add(this.ms_Water);
 		aMeshMirror.rotation.x = - Math.PI * 0.5;
 		
