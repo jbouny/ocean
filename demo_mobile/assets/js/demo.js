@@ -101,7 +101,7 @@ var DEMO = {
 		});
 		
 		var skyBox = new THREE.Mesh(
-			new THREE.CubeGeometry(100000, 100000, 100000),
+			new THREE.BoxGeometry(100000, 100000, 100000),
 			skyBoxMaterial
 		);
 		this.ms_Scene.add(skyBox);

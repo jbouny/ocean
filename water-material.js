@@ -245,7 +245,7 @@ THREE.Water.prototype.renderWithMirror = function (otherMirror) {
 	otherMirror.camera = this.mirrorCamera;
 
 	// render the other mirror in temp texture
-	otherMirror.renderTemp();
+	otherMirror.render(true);
 	otherMirror.material.uniforms.mirrorSampler.value = otherMirror.tempTexture;
 
 	// render the current mirror
@@ -346,7 +346,7 @@ THREE.Water.prototype.updateTextureMatrix = function () {
 	this.material.uniforms.eye.value = this.eye;
 };
 
-THREE.Water.prototype.render = function () {
+THREE.Water.prototype.render = function (isTempTexture) {
 
 	if(this.matrixNeedsUpdate)
 		this.updateTextureMatrix();
@@ -356,22 +356,8 @@ THREE.Water.prototype.render = function () {
 	// Render the mirrored view of the current scene into the target texture
 	if(this.scene !== undefined && this.scene instanceof THREE.Scene)
 	{
-        this.renderer.render(this.scene, this.mirrorCamera, this.texture, true);
-	}
-
-};
-
-THREE.Water.prototype.renderTemp = function () {
-
-	if(this.matrixNeedsUpdate)
-		this.updateTextureMatrix();
-
-	this.matrixNeedsUpdate = true;
-
-	// Render the mirrored view of the current scene into the target texture
-	if(this.scene !== undefined && this.scene instanceof THREE.Scene)
-	{
-		this.renderer.render(this.scene, this.mirrorCamera, this.tempTexture, true);
+		var renderTexture = (isTempTexture !== undefined && isTempTexture)? this.tempTexture : this.texture;
+        this.renderer.render(this.scene, this.mirrorCamera, renderTexture, true);
 	}
 
 };

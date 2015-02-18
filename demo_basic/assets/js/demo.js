@@ -87,7 +87,7 @@ var DEMO = {
 		});
 
 		var aSkybox = new THREE.Mesh(
-		  new THREE.CubeGeometry(1000000, 1000000, 1000000),
+		  new THREE.BoxGeometry(1000000, 1000000, 1000000),
 		  aSkyBoxMaterial
 		);
 		
