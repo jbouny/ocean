@@ -53,7 +53,7 @@ var DEMO = {
 			side: THREE.DoubleSide
 		});
 		var aMeshMirror = new THREE.Mesh(
-			new THREE.PlaneGeometry(2000, 2000, 100, 100), 
+			new THREE.PlaneBufferGeometry(2000, 2000, 1, 1), 
 			this.ms_Water.material
 		);
 		aMeshMirror.add(this.ms_Water);

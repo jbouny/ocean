@@ -80,7 +80,7 @@ var DEMO = {
 			distortionScale: 50.0
 		});
 		var aMeshMirror = new THREE.Mesh(
-			new THREE.PlaneGeometry(inParameters.width * 500, inParameters.height * 500, 5, 5), 
+			new THREE.PlaneBufferGeometry(inParameters.width * 500, inParameters.height * 500, 1, 1), 
 			this.ms_Water.material
 		);
 		aMeshMirror.add(this.ms_Water);
