@@ -138,9 +138,6 @@ THREE.Water = function (renderer, camera, scene, options) {
 	THREE.Object3D.call(this);
 	this.name = 'water_' + this.id;
 
-	function isPowerOfTwo (value) {
-		return (value & (value - 1)) === 0;
-	};
 	function optionalParameter (value, defaultValue) {
 		return value !== undefined ? value : defaultValue;
 	};
@@ -215,7 +212,7 @@ THREE.Water = function (renderer, camera, scene, options) {
 	
 	this.material.uniforms.eye.value = this.eye;
 	
-	if ( !isPowerOfTwo(width) || !isPowerOfTwo(height) ) {
+	if ( !THREE.Math.isPowerOfTwo(width) || !THREE.Math.isPowerOfTwo(height) ) {
 		this.texture.generateMipmaps = false;
 		this.tempTexture.generateMipmaps = false;
 	}
@@ -225,10 +222,6 @@ THREE.Water = function (renderer, camera, scene, options) {
 };
 
 THREE.Water.prototype = Object.create(THREE.Object3D.prototype);
-
-THREE.Water.prototype.setMesh = function (mesh) {
-	this.mesh = mesh;
-}
 
 THREE.Water.prototype.renderWithMirror = function (otherMirror) {
 
@@ -257,7 +250,9 @@ THREE.Water.prototype.renderWithMirror = function (otherMirror) {
 };
 
 THREE.Water.prototype.updateTextureMatrix = function () {
-
+	if ( this.parent != undefined ) {
+		this.mesh = this.parent ;
+	}
 	function sign(x) { return x ? x < 0 ? -1 : 1 : 0; }
 
 	this.updateMatrixWorld();
@@ -270,10 +265,8 @@ THREE.Water.prototype.updateTextureMatrix = function () {
 	this.normal = (new THREE.Vector3(0, 0, 1)).applyEuler(this.mesh.rotation);
 	var cameraLookAt = (new THREE.Vector3(0, 0, 1)).applyEuler(this.camera.rotation);
 	if ( this.normal.dot(cameraLookAt) < 0 ) {
-	
 		var meshNormal = (new THREE.Vector3(0, 0, 1)).applyEuler(this.mesh.rotation);
 		this.normal.reflect(meshNormal);
-		
 	}
 
 	var view = this.mesh.position.clone().sub(this.cameraWorldPosition);
