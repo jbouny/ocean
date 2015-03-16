@@ -186,6 +186,7 @@ THREE.Water = function (renderer, camera, scene, options) {
 	
 	this.texture = new THREE.WebGLRenderTarget(width, height);
 	this.tempTexture = new THREE.WebGLRenderTarget(width, height);
+	this.dummyTexture = new THREE.WebGLRenderTarget(1, 1);
 	
 	var mirrorShader = THREE.ShaderLib["water"];
 	var mirrorUniforms = THREE.UniformsUtils.clone(mirrorShader.uniforms);
@@ -237,14 +238,12 @@ THREE.Water.prototype.renderWithMirror = function (otherMirror) {
 
 	// render the other mirror in temp texture
 	otherMirror.render(true);
-	otherMirror.material.uniforms.mirrorSampler.value = otherMirror.tempTexture;
 
 	// render the current mirror
 	this.render();
 	this.matrixNeedsUpdate = true;
 
 	// restore material and camera of other mirror
-	otherMirror.material.uniforms.mirrorSampler.value = otherMirror.texture;
 	otherMirror.camera = tempCamera;
 
 	// restore texture matrix of other mirror
@@ -252,8 +251,8 @@ THREE.Water.prototype.renderWithMirror = function (otherMirror) {
 };
 
 THREE.Water.prototype.updateTextureMatrix = function () {
-	if ( this.parent != undefined ) {
-		this.mesh = this.parent ;
+	if ( this.parent !== undefined ) {
+		this.mesh = this.parent;
 	}
 	function sign(x) { return x ? x < 0 ? -1 : 1 : 0; }
 
@@ -347,8 +346,14 @@ THREE.Water.prototype.render = function (isTempTexture) {
 
 	// Render the mirrored view of the current scene into the target texture
 	if ( this.scene !== undefined && this.scene instanceof THREE.Scene ) {
+    // Remove the mirror texture from the scene the moment it is used as render texture
+    // https://github.com/jbouny/ocean/issues/7 
+    this.material.uniforms.mirrorSampler.value = this.dummyTexture;
+    
 		var renderTexture = (isTempTexture !== undefined && isTempTexture)? this.tempTexture : this.texture;
-        this.renderer.render(this.scene, this.mirrorCamera, renderTexture, true);
+    this.renderer.render(this.scene, this.mirrorCamera, renderTexture, true);
+    
+    this.material.uniforms.mirrorSampler.value = renderTexture;
 	}
 
 };
