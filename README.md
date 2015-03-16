@@ -6,11 +6,10 @@ It can be used to render water in some situations like complete ocean or small s
 
 ### Demos
 
-http://jeremybouny.fr/ocean/demo/
-
-http://jeremybouny.fr/ocean/demo_basic/
-
-http://jeremybouny.fr/ocean/demo_mobile/ <- only for smartphone and tablet, you can control the camera with these devices
+* [Demo](https://jbouny.github.io/ocean/demo/)
+* [Basic demo](https://jbouny.github.io/ocean/demo_basic/)
+* [Mobile control demo](https://jbouny.github.io/ocean/demo_mobile/)
+* [Fog and rotation demo](https://jbouny.github.io/ocean/demo_test/)
 
 ### Dependencies
 
