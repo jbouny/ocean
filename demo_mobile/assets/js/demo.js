@@ -65,7 +65,7 @@ var DEMO = {
 			betaVersion: 0
 		});
 		var aMeshMirror = new THREE.Mesh(
-			new THREE.PlaneBufferGeometry(1500, 1500, 1, 1), 
+			new THREE.PlaneBufferGeometry(1500, 1500, 10, 10), 
 			this.ms_Water.material
 		);
 		aMeshMirror.add(this.ms_Water);
