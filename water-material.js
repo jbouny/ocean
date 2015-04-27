@@ -100,7 +100,8 @@ THREE.ShaderLib['water'] = {
 		
 		// Get noise based on the 3d position
 		'	vec3 noise = getNoise(modelPosition.xy * 1.0);',
-		'	vec3 distordNormal = noise.x * surfaceX + noise.y * surfaceY + surfaceZ;',
+		'	vec3 distordCoord = noise.x * surfaceX + noise.y * surfaceY;',
+		'	vec3 distordNormal = distordCoord + surfaceZ;',
 		
 		// Revert normal if the eye is bellow the mesh
 		'	if(dot(eyeDirection, surfaceZ) < 0.0)',
@@ -113,7 +114,7 @@ THREE.ShaderLib['water'] = {
 		
 		// Compute final 3d distortion, and project it to get the mirror sampling
 		'	float distance = length(worldToEye);',
-		'	vec2 distortion = ( (distordNormal - surfaceZ).xy ) * distortionScale * sqrt(distance) * 0.07;',
+		'	vec2 distortion = distordCoord.xy * distortionScale * sqrt(distance) * 0.07;',
     ' vec3 mirrorDistord = mirrorCoord.xyz + vec3(distortion.x, distortion.y, 1.0);',
     ' vec3 reflectionSample = texture2DProj(mirrorSampler, mirrorDistord).xyz;',
 
