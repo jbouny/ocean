@@ -83,10 +83,10 @@ THREE.ShaderLib['water'] = {
 		'	vec2 uv1 = uv / (107.0 * noiseScale) - vec2(time / -19.0, time / 31.0);',
 		'	vec2 uv2 = uv / (vec2(8907.0, 9803.0) * noiseScale) + vec2(time / 101.0, time /   97.0);',
 		'	vec2 uv3 = uv / (vec2(1091.0, 1027.0) * noiseScale) - vec2(time / 109.0, time / -113.0);',
-		'	vec4 noise = (texture2D(normalSampler, uv0)) +',
-        '		(texture2D(normalSampler, uv1)) +',
-        '		(texture2D(normalSampler, uv2)) +',
-		'		(texture2D(normalSampler, uv3));',
+		'	vec4 noise = texture2D(normalSampler, uv0) +',
+    '		texture2D(normalSampler, uv1) +',
+    '		texture2D(normalSampler, uv2) +',
+		'		texture2D(normalSampler, uv3);',
 		'	return noise.xyz * 0.5 - 1.0;',
 		'}',
 		
@@ -99,8 +99,8 @@ THREE.ShaderLib['water'] = {
 		'	vec3 eyeDirection = normalize(worldToEye);',
 		
 		// Get noise based on the 3d position
-		'	vec3 noise = (getNoise(modelPosition.xy * 1.0));',
-		'	vec3 distordNormal = noise.x * surfaceX + noise.y * surfaceY + noise.z * surfaceZ;',
+		'	vec3 noise = getNoise(modelPosition.xy * 1.0);',
+		'	vec3 distordNormal = noise.x * surfaceX + noise.y * surfaceY + surfaceZ;',
 		
 		// Revert normal if the eye is bellow the mesh
 		'	if(dot(eyeDirection, surfaceZ) < 0.0)',
@@ -113,20 +113,19 @@ THREE.ShaderLib['water'] = {
 		
 		// Compute final 3d distortion, and project it to get the mirror sampling
 		'	float distance = length(worldToEye);',
-		'	vec2 distortion = distordNormal.xz * distortionScale * sqrt(distance) * 0.07;',
-        '   vec3 mirrorDistord = mirrorCoord.xyz + vec3(distortion.x, distortion.y, 1.0);',
-        '   vec3 reflectionSample = texture2DProj(mirrorSampler, mirrorDistord).xyz;',
+		'	vec2 distortion = ( (distordNormal - surfaceZ).xy ) * distortionScale * sqrt(distance) * 0.07;',
+    ' vec3 mirrorDistord = mirrorCoord.xyz + vec3(distortion.x, distortion.y, 1.0);',
+    ' vec3 reflectionSample = texture2DProj(mirrorSampler, mirrorDistord).xyz;',
 
 		// Compute other parameters as the reflectance and the water appareance
 		'	float theta = max(dot(eyeDirection, distordNormal), 0.0);',
-		'	const float rf0 = 0.3;',
-		'	float reflectance = 0.3 + (1.0 - 0.3) * pow((1.0 - theta), 5.0);',
+		'	float reflectance = 0.3 + (1.0 - 0.3) * pow((1.0 - theta), 3.0);',
 		'	vec3 scatter = max(0.0, dot(distordNormal, eyeDirection)) * waterColor;',
 		
 		// Compute final pixel color
 		'	vec3 albedo = mix(sunColor * diffuseLight * 0.3 + scatter, (vec3(0.1) + reflectionSample * 0.9 + reflectionSample * specularLight), reflectance);',
 		
-		' vec3 outgoingLight = albedo;',    
+		' vec3 outgoingLight = albedo;', 
     THREE.ShaderChunk[ "fog_fragment" ],
     
 		' gl_FragColor = vec4( outgoingLight, alpha );',
