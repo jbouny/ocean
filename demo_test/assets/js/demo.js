@@ -74,7 +74,7 @@ var DEMO = {
       for ( var j = -2; j <= 2; ++ j ) {
         for ( var k = 0-2; k <= 2; ++ k ) {
           var geometry = new THREE.BoxGeometry( 100, 100, 100 );
-          var material = new THREE.MeshLambertMaterial( { fog: true, color: new THREE.Color( 0.5 + i * 0.2, 0.5 + j * 0.2, 0.5 + k * 0.2 ) } );
+          var material = new THREE.MeshLambertMaterial( { fog: true, side: THREE.DoubleSide, color: new THREE.Color( 0.5 + i * 0.2, 0.5 + j * 0.2, 0.5 + k * 0.2 ) } );
           var mesh = new THREE.Mesh( geometry, material );
           mesh.position.set( i * 300, j * 300, k * 300 );
           this.ms_Scene.add( mesh );
