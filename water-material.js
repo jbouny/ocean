@@ -14,7 +14,7 @@ THREE.ShaderLib['water'] = {
       "normalSampler":    { type: "t", value: null },
       "mirrorSampler":    { type: "t", value: null },
       "alpha":            { type: "f", value: 1.0 },
-      "time":              { type: "f", value: 0.0 },
+      "time":             { type: "f", value: 0.0 },
       "distortionScale":  { type: "f", value: 20.0 },
       "noiseScale":       { type: "f", value: 1.0 },
       "textureMatrix" :   { type: "m4", value: new THREE.Matrix4() },
@@ -264,8 +264,8 @@ THREE.Water.prototype.updateTextureMatrix = function () {
   this.rotationMatrix.extractRotation(this.matrixWorld);
 
   this.normal = (new THREE.Vector3(0, 0, 1)).applyEuler(this.mesh.rotation);
-  var cameraLookAt = (new THREE.Vector3(0, 0, 1)).applyEuler(this.camera.rotation);
-  if ( this.normal.dot(cameraLookAt) < 0 ) {
+  var cameraPosition = this.camera.position.clone().sub( this.mesh.position );
+  if ( this.normal.dot(cameraPosition) < 0 ) {
     var meshNormal = (new THREE.Vector3(0, 0, 1)).applyEuler(this.mesh.rotation);
     this.normal.reflect(meshNormal);
   }
