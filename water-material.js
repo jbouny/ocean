@@ -219,9 +219,6 @@ THREE.Water = function (renderer, camera, scene, options) {
     this.texture.generateMipmaps = false;
     this.tempTexture.generateMipmaps = false;
   }
-
-  this.updateTextureMatrix();
-  this.render();
 };
 
 THREE.Water.prototype = Object.create(THREE.Object3D.prototype);

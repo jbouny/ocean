@@ -6,7 +6,7 @@ var DEMO = {
 	ms_Controls: null,
 	ms_Water: null,
 	ms_FilesDND: null,
-	ms_Projector: null,
+	ms_Raycaster: null,
 	ms_Clickable: [],
 
     enable: (function enable() {
@@ -31,7 +31,7 @@ var DEMO = {
 		this.ms_Camera.position.set(0, Math.max(inParameters.width * 1.5, inParameters.height) / 8, -inParameters.height);
 		this.ms_Camera.lookAt(new THREE.Vector3(0, 0, 0));
 
-		this.ms_Projector = new THREE.Projector();
+		this.ms_Raycaster = new THREE.Raycaster();
 		
 		// Initialize Orbit control		
 		this.ms_Controls = new THREE.OrbitControls(this.ms_Camera, this.ms_Renderer.domElement);
@@ -57,6 +57,7 @@ var DEMO = {
 			if(DEMO.ms_FilesDND == null)
 			{
 				var aTextureFDND = THREE.ImageUtils.loadTexture("assets/img/filesdnd_ad.png");
+				aTextureFDND.minFilter = THREE.LinearFilter;
 				DEMO.ms_FilesDND = new THREE.Mesh(new THREE.PlaneGeometry(1000, 1000), new THREE.MeshBasicMaterial({ map : aTextureFDND, transparent: true, side : THREE.DoubleSide }));
 
 				// Mesh callback
