@@ -49,8 +49,8 @@ var DEMO = {
 		directionalLight.position.set(-400, 100, -500);
 		this.ms_Scene.add(directionalLight);
 		
-		// Load textures		
-		var waterNormals = new THREE.ImageUtils.loadTexture('../assets/img/waternormals.jpg');
+		// Load textures
+		var waterNormals = new THREE.TextureLoader().load('../assets/img/waternormals.jpg');
 		waterNormals.wrapS = waterNormals.wrapT = THREE.RepeatWrapping; 
 		
 		// Create the water effect
@@ -85,7 +85,7 @@ var DEMO = {
             path + 'skybox_4' + format, path + 'skybox_5' + format
         ];
 
-        var cubeMap = THREE.ImageUtils.loadTextureCube(urls);
+        var cubeMap = new THREE.CubeTextureLoader().load(urls);
         cubeMap.format = THREE.RGBFormat;
         cubeMap.flipY = false;
 

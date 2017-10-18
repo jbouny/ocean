@@ -13,7 +13,7 @@ It can be used to render water in some situations like complete ocean or small s
 
 ### Dependencies
 
-- Three.js r71 to render the scene : https://github.com/mrdoob/three.js/
+- Three.js r87 to render the scene : https://github.com/mrdoob/three.js/
 - JQuery 1.10.2 as a helper : https://github.com/jquery/jquery
 - Terrain-generator for procedural terrain generation : https://github.com/jbouny/terrain-generator
 

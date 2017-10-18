@@ -48,15 +48,16 @@ var DEMO = {
 		// Create terrain
 		this.loadTerrain(inParameters);
 		
-		// Load textures		
-		var waterNormals = new THREE.ImageUtils.loadTexture('../assets/img/waternormals.jpg');
+		// Load textures
+		var loader = new THREE.TextureLoader();
+		var waterNormals = loader.load('../assets/img/waternormals.jpg');
 		waterNormals.wrapS = waterNormals.wrapT = THREE.RepeatWrapping; 
 		
 		// Load filesdnd texture
 		new Konami(function() {
 			if(DEMO.ms_FilesDND == null)
 			{
-				var aTextureFDND = THREE.ImageUtils.loadTexture("assets/img/filesdnd_ad.png");
+				var aTextureFDND = loader.load("assets/img/filesdnd_ad.png");
 				aTextureFDND.minFilter = THREE.LinearFilter;
 				DEMO.ms_FilesDND = new THREE.Mesh(new THREE.PlaneGeometry(1000, 1000), new THREE.MeshBasicMaterial({ map : aTextureFDND, transparent: true, side : THREE.DoubleSide }));
 
@@ -92,7 +93,7 @@ var DEMO = {
 	},
 	
 	loadSkyBox: function loadSkyBox() {
-		var aCubeMap = THREE.ImageUtils.loadTextureCube([
+		var aCubeMap = new THREE.CubeTextureLoader().load([
 		  'assets/img/px.jpg',
 		  'assets/img/nx.jpg',
 		  'assets/img/py.jpg',
@@ -123,7 +124,7 @@ var DEMO = {
 	
 	loadTerrain: function loadTerrain(inParameters) {
 		var terrainGeo = TERRAINGEN.Get(inParameters);
-		var terrainMaterial = new THREE.MeshPhongMaterial({ vertexColors: THREE.VertexColors, shading: THREE.FlatShading, side: THREE.DoubleSide });
+		var terrainMaterial = new THREE.MeshPhongMaterial({ vertexColors: THREE.VertexColors, flatShading: true, side: THREE.DoubleSide });
 		
 		var terrain = new THREE.Mesh(terrainGeo, terrainMaterial);
 		terrain.position.y = - inParameters.depth * 0.4;
