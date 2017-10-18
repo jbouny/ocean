@@ -35,7 +35,9 @@ THREE.ShaderLib['water'] = {
     'varying vec3 surfaceX;',
     'varying vec3 surfaceY;',
     'varying vec3 surfaceZ;',
-    
+
+    THREE.ShaderChunk[ "fog_pars_vertex"],
+
     'void main()',
     '{',
     '  mirrorCoord = modelMatrix * vec4(position, 1.0);',
@@ -46,7 +48,11 @@ THREE.ShaderLib['water'] = {
     '  surfaceZ = vec3( modelMatrix[2][0], modelMatrix[2][1], modelMatrix[2][2]);',
     
     '  mirrorCoord = textureMatrix * mirrorCoord;',
-    '  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);',
+    '  vec4 mvPosition =  modelViewMatrix * vec4( position, 1.0 );',
+    '  gl_Position = projectionMatrix * mvPosition;',
+
+    THREE.ShaderChunk[ "fog_vertex"],
+
     '}'
   ].join('\n'),
 
@@ -127,9 +133,9 @@ THREE.ShaderLib['water'] = {
     '  vec3 albedo = mix(sunColor * diffuseLight * 0.3 + scatter, (vec3(0.1) + reflectionSample * 0.9 + reflectionSample * specularLight), reflectance);',
     
     ' vec3 outgoingLight = albedo;', 
-    THREE.ShaderChunk[ "fog_fragment" ],
     
     ' gl_FragColor = vec4( outgoingLight, alpha );',
+    THREE.ShaderChunk[ "fog_fragment" ],
     '}'
   ].join('\n')
 
@@ -184,8 +190,8 @@ THREE.Water = function (renderer, camera, scene, options) {
 
   this.mirrorCamera = this.camera.clone();
   
-  this.texture = new THREE.WebGLRenderTarget(width, height);
-  this.tempTexture = new THREE.WebGLRenderTarget(width, height);
+  this.renderTarget = new THREE.WebGLRenderTarget(width, height);
+  this.tempRenderTarget = new THREE.WebGLRenderTarget(width, height);
   
   var mirrorShader = THREE.ShaderLib["water"];
   var mirrorUniforms = THREE.UniformsUtils.clone(mirrorShader.uniforms);
@@ -201,7 +207,7 @@ THREE.Water = function (renderer, camera, scene, options) {
   
   this.mesh = new THREE.Object3D();
 
-  this.material.uniforms.mirrorSampler.value = this.texture;
+  this.material.uniforms.mirrorSampler.value = this.renderTarget.texture;
   this.material.uniforms.textureMatrix.value = this.textureMatrix;
   this.material.uniforms.alpha.value = this.alpha;
   this.material.uniforms.time.value = this.time;
@@ -215,8 +221,8 @@ THREE.Water = function (renderer, camera, scene, options) {
   this.material.uniforms.eye.value = this.eye;
   
   if ( !THREE.Math.isPowerOfTwo(width) || !THREE.Math.isPowerOfTwo(height) ) {
-    this.texture.generateMipmaps = false;
-    this.tempTexture.generateMipmaps = false;
+    this.renderTarget.texture.generateMipmaps = false;
+    this.tempRenderTarget.texture.generateMipmaps = false;
   }
 };
 
@@ -346,11 +352,11 @@ THREE.Water.prototype.render = function (isTempTexture) {
     // https://github.com/jbouny/ocean/issues/7 
     this.material.visible = false;
     
-    var renderTexture = (isTempTexture !== undefined && isTempTexture)? this.tempTexture : this.texture;
-    this.renderer.render(this.scene, this.mirrorCamera, renderTexture, true);
+    var renderTarget = (isTempTexture !== undefined && isTempTexture)? this.tempRenderTarget : this.renderTarget;
+    this.renderer.render(this.scene, this.mirrorCamera, renderTarget, true);
     
     this.material.visible = true;
-    this.material.uniforms.mirrorSampler.value = renderTexture;
+    this.material.uniforms.mirrorSampler.value = renderTarget.texture;
   }
 
 };
